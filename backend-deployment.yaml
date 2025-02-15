@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: community-energy-allocation:0.0.1-SNAPSHOT
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATA_MONGODB_URI
+              value: mongodb://mongodb-service:27017/energydb
+            - name: SPRING_DATA_MONGODB_DB_NAME
+              value: energydb
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: JWT_KEY
+              valueFrom:
+               secretKeyRef:
+                 name: jwt-secret
+                 key: jwt-key
+            - name: JWT_JWK_SET_URI
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: jwt-jwk-set-uri
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwt-secret
+type: Opaque
+stringData:
+  jwt-key: ${JWT_KEY}
+  jwt-jwk-set-uri: ${JWT_JWK_SET_URI}

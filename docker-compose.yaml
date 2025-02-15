@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/energydb
+      SPRING_PROFILES_ACTIVE: prod
+      JWT_KEY: ${JWT_KEY}
+      JWT_JWK_SET_URI: ${JWT_JWK_SET_URI}
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+volumes:
+  mongodb_data:
