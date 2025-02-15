@@ -53,7 +53,7 @@ jobs:
 #      uses: azure/k8s-deploy@v1
 #      with:
 #        manifests: |
-#          backend-deployment.yaml
-#          mongodb-deployment.yaml
+#          k8s/backend-deployment.yaml
+#          k8s/mongodb-deployment.yaml
 #      env:
 #        KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
