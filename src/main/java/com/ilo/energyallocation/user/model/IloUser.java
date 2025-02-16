@@ -1,6 +1,5 @@
 package com.ilo.energyallocation.user.model;
 
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-@Builder
+
 @Document(collection = "users")
 public class IloUser implements UserDetails {
     @Id

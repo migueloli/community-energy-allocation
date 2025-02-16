@@ -72,7 +72,7 @@ public class AuthenticationService implements IAuthenticationService {
         }
 
         // Generate password reset token
-        String resetToken = jwtService.generatePasswordResetToken(userDetails);
+        String resetToken = jwtService.generateResetToken(userDetails);
 
         /*
           Here it would call a separate service or send an event to a queue

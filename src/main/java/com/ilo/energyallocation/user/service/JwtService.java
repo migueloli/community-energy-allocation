@@ -3,7 +3,10 @@ package com.ilo.energyallocation.user.service;
 import com.ilo.energyallocation.common.exception.TokenException;
 import com.ilo.energyallocation.common.security.interfaces.IJwtService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +45,7 @@ public class JwtService implements IJwtService {
 
     @Override
     public String generateAccessToken(UserDetails userDetails, Map<String, Object> extraClaims) {
-        return buildToken(userDetails, extraClaims, accessTokenExpiration);
+        return buildToken(userDetails, extraClaims, accessTokenExpiration, "access");
     }
 
     @Override
@@ -52,17 +55,17 @@ public class JwtService implements IJwtService {
 
     @Override
     public String generateRefreshToken(UserDetails userDetails, Map<String, Object> extraClaims) {
-        return buildToken(userDetails, extraClaims, refreshTokenExpiration);
+        return buildToken(userDetails, extraClaims, refreshTokenExpiration, "refresh");
     }
 
     @Override
-    public String generatePasswordResetToken(UserDetails userDetails) {
+    public String generateResetToken(UserDetails userDetails) {
         return generateRefreshToken(userDetails, new HashMap<>());
     }
 
     @Override
-    public String generatePasswordResetToken(UserDetails userDetails, Map<String, Object> extraClaims) {
-        return buildToken(userDetails, extraClaims, resetTokenExpiration);
+    public String generateResetToken(UserDetails userDetails, Map<String, Object> extraClaims) {
+        return buildToken(userDetails, extraClaims, resetTokenExpiration, "reset");
     }
 
     @Override
@@ -75,11 +78,22 @@ public class JwtService implements IJwtService {
                 .getPayload();
     }
 
-    @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        try {
+            final Claims claims = extractAllClaims(token);
+            if (claims == null) {
+                throw new JwtException("Invalid claims");
+            }
+            return claimsResolver.apply(claims);
+        } catch (ExpiredJwtException e) {
+            throw new JwtException("Token has expired");
+        } catch (MalformedJwtException e) {
+            throw new JwtException("Malformed token");
+        } catch (Exception e) {
+            throw new JwtException("Error extracting claims: " + e.getMessage());
+        }
     }
+
 
     @Override
     public String extractUsername(String token) {
@@ -131,12 +145,13 @@ public class JwtService implements IJwtService {
         return resetTokenExpiration;
     }
 
-    private String buildToken(UserDetails userDetails, Map<String, Object> extraClaims, long expiration) {
+    private String buildToken(UserDetails userDetails, Map<String, Object> extraClaims, long expiration, String tokenType) {
         return Jwts.builder()
                 .claims()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
+                .add("tokenType", tokenType)
                 .add(extraClaims)
                 .and()
                 .signWith(secretKey)

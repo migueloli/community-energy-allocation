@@ -17,9 +17,9 @@ public interface IJwtService {
 
     String generateRefreshToken(UserDetails userDetails, Map<String, Object> extraClaims);
 
-    String generatePasswordResetToken(UserDetails userDetails);
+    String generateResetToken(UserDetails userDetails);
 
-    String generatePasswordResetToken(UserDetails userDetails, Map<String, Object> extraClaims);
+    String generateResetToken(UserDetails userDetails, Map<String, Object> extraClaims);
 
     Claims extractAllClaims(String token);
 
