@@ -10,23 +10,19 @@ import com.ilo.energyallocation.user.model.Role;
 import com.ilo.energyallocation.user.repository.UserRepository;
 import com.ilo.energyallocation.user.service.interfaces.IUserService;
 import com.mongodb.DuplicateKeyException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
-    }
 
     @Override
     public IloUser loadUserByUsername(final String username) {
@@ -69,8 +65,13 @@ public class UserService implements IUserService {
         final IloUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
-        user.setEmail(updateDTO.getEmail());
-        user.setPreference(updateDTO.getPreference());
+        if (updateDTO.getEmail() != null && !updateDTO.getEmail().trim().isEmpty()) {
+            user.setEmail(updateDTO.getEmail().trim());
+        }
+
+        if (updateDTO.getPreference() != null) {
+            user.setPreference(updateDTO.getPreference());
+        }
 
         return userRepository.save(user);
     }

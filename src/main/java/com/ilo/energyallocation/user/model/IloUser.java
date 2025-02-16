@@ -2,7 +2,6 @@ package com.ilo.energyallocation.user.model;
 
 import lombok.Builder;
 import lombok.Data;
-import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -27,7 +26,6 @@ public class IloUser implements UserDetails {
     @Indexed(unique = true)
     private String email;
 
-    @JsonIgnore
     private String password;
     private List<Role> roles;
     private EnergyPreference preference;

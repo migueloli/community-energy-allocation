@@ -10,6 +10,7 @@ import com.ilo.energyallocation.user.dto.TokenResponseDTO;
 import com.ilo.energyallocation.user.model.IloUser;
 import com.ilo.energyallocation.user.service.interfaces.IAuthenticationService;
 import com.ilo.energyallocation.user.service.interfaces.IUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,17 +18,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService implements IAuthenticationService {
 
     private final AuthenticationManager authenticationManager;
     private final IJwtService jwtService;
     private final IUserService userService;
-
-    public AuthenticationService(AuthenticationManager authenticationManager, IJwtService jwtService, IUserService userDetailsService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-        this.userService = userDetailsService;
-    }
 
     @Override
     public TokenResponseDTO authenticateAndGenerateToken(final LoginRequestDTO loginRequest) {

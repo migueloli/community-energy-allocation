@@ -7,6 +7,7 @@ import com.ilo.energyallocation.user.dto.RefreshTokenRequestDTO;
 import com.ilo.energyallocation.user.dto.ResetPasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.TokenResponseDTO;
 import com.ilo.energyallocation.user.service.interfaces.IAuthenticationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,13 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final IAuthenticationService authenticationService;
-
-    public AuthController(IAuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDTO> login(@RequestBody final LoginRequestDTO loginRequest) {

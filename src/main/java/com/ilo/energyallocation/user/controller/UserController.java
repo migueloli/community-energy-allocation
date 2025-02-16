@@ -7,6 +7,7 @@ import com.ilo.energyallocation.user.dto.UserUpdateRequestDTO;
 import com.ilo.energyallocation.user.mapper.UserMapper;
 import com.ilo.energyallocation.user.model.IloUser;
 import com.ilo.energyallocation.user.service.interfaces.IUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,14 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
     private final IUserService userService;
     private final UserMapper userMapper;
-
-    public UserController(IUserService userService, UserMapper userMapper) {
-        this.userService = userService;
-        this.userMapper = userMapper;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> registerUser(@RequestBody final UserRegistrationRequestDTO registrationDTO) {
