@@ -9,8 +9,11 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       JWT_KEY: ${JWT_KEY}
       JWT_JWK_SET_URI: ${JWT_JWK_SET_URI}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
     depends_on:
       - mongo
+      - redis
   mongo:
     image: mongo:6.0
     container_name: mongo
@@ -18,5 +21,12 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+  redis:
+    image: redis:7.2
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
 volumes:
   mongodb_data:
+  redis_data:

@@ -8,11 +8,9 @@ spring:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
       database: ${SPRING_DATA_MONGODB_DB_NAME}
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${JWT_JWK_SET_URI}
+  redis:
+    host: ${SPRING_REDIS_HOST:localhost}
+    port: ${SPRING_REDIS_PORT:6379}
 
 jwt:
   secret: ${JWT_KEY}
@@ -37,4 +35,3 @@ spring:
       on-profile: test
   data:
     mongodb:
-      uri: mongodb://localhost:27017/testdb

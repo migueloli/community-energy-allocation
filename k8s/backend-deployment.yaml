@@ -26,14 +26,13 @@ spec:
               value: prod
             - name: JWT_KEY
               valueFrom:
-               secretKeyRef:
-                 name: jwt-secret
-                 key: jwt-key
-            - name: JWT_JWK_SET_URI
-              valueFrom:
                 secretKeyRef:
                   name: jwt-secret
-                  key: jwt-jwk-set-uri
+                  key: jwt-key
+            - name: SPRING_REDIS_HOST
+              value: redis-service
+            - name: SPRING_REDIS_PORT
+              value: "6379"
 ---
 apiVersion: v1
 kind: Service
@@ -55,4 +54,3 @@ metadata:
 type: Opaque
 stringData:
   jwt-key: ${JWT_KEY}
-  jwt-jwk-set-uri: ${JWT_JWK_SET_URI}
