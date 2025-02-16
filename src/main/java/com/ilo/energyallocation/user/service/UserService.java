@@ -61,7 +61,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public IloUser updateUser(String userId, UserUpdateRequestDTO updateDTO) {
+    public IloUser updateUser(final String userId, final UserUpdateRequestDTO updateDTO) {
         final IloUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
@@ -77,7 +77,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void changePassword(String userId, ChangePasswordRequestDTO changePasswordDTO) {
+    public void changePassword(final String userId, final ChangePasswordRequestDTO changePasswordDTO) {
         final IloUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
@@ -90,7 +90,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public IloUser getUserById(String userId) {
+    public IloUser getUserById(final String userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
     }

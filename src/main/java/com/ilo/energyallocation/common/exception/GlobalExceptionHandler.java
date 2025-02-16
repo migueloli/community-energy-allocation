@@ -10,13 +10,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getStatus().value(), ex.getMessage());
+        final ErrorResponse errorResponse = new ErrorResponse(ex.getStatus().value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, ex.getStatus());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        ErrorResponse errorResponse = new ErrorResponse(500, "An unexpected error occurred");
+        final ErrorResponse errorResponse = new ErrorResponse(500, "An unexpected error occurred");
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

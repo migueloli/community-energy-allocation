@@ -40,7 +40,7 @@ public class UserController {
 
     @PutMapping("/me")
     public ResponseEntity<UserResponseDTO> updateUser(@AuthenticationPrincipal final IloUser user, @Valid @RequestBody final UserUpdateRequestDTO updateDTO) {
-        IloUser updatedUser = userService.updateUser(user.getId(), updateDTO);
+        final IloUser updatedUser = userService.updateUser(user.getId(), updateDTO);
         return ResponseEntity.ok(userMapper.toDTO(updatedUser));
     }
 
@@ -53,7 +53,7 @@ public class UserController {
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable final String userId) {
-        IloUser user = userService.getUserById(userId);
+        final IloUser user = userService.getUserById(userId);
         return ResponseEntity.ok(userMapper.toDTO(user));
     }
 }

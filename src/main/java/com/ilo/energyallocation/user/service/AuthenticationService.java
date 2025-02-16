@@ -58,21 +58,21 @@ public class AuthenticationService implements IAuthenticationService {
     }
 
     @Override
-    public void logout(String refreshToken) {
+    public void logout(final String refreshToken) {
         // For a real-world application, you would typically store and manage refresh tokens securely.
         // e.g. store them in a database and validate them when refreshing tokens.
         // or use a OAuth2 library to handle token management.
     }
 
     @Override
-    public void initiatePasswordReset(String email) {
-        UserDetails userDetails = userService.loadUserByUsername(email);
+    public void initiatePasswordReset(final String email) {
+        final UserDetails userDetails = userService.loadUserByUsername(email);
         if (userDetails == null) {
             throw new UserNotFoundException("User not found with email: " + email);
         }
 
         // Generate password reset token
-        String resetToken = jwtService.generateResetToken(userDetails);
+        final String resetToken = jwtService.generateResetToken(userDetails);
 
         /*
           Here it would call a separate service or send an event to a queue
@@ -82,13 +82,13 @@ public class AuthenticationService implements IAuthenticationService {
     }
 
     @Override
-    public void resetPassword(String token, String newPassword) {
-        String username = jwtService.extractUsername(token);
+    public void resetPassword(final String token, final String newPassword) {
+        final String username = jwtService.extractUsername(token);
         if (username == null) {
             throw new TokenException("Invalid reset token");
         }
 
-        IloUser user = (IloUser) userService.loadUserByUsername(username);
+        final IloUser user = (IloUser) userService.loadUserByUsername(username);
         if (!jwtService.isTokenValid(token, user)) {
             throw new TokenException("Invalid or expired reset token");
         }
@@ -99,7 +99,7 @@ public class AuthenticationService implements IAuthenticationService {
         );
     }
 
-    private TokenResponseDTO generateTokenResponse(UserDetails userDetails) {
+    private TokenResponseDTO generateTokenResponse(final UserDetails userDetails) {
         final String accessToken = jwtService.generateAccessToken(userDetails);
         final String refreshToken = jwtService.generateRefreshToken(userDetails);
         final long expiresIn = jwtService.getAccessTokenExpiration();

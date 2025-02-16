@@ -39,37 +39,37 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public String generateAccessToken(UserDetails userDetails) {
+    public String generateAccessToken(final UserDetails userDetails) {
         return generateAccessToken(userDetails, new HashMap<>());
     }
 
     @Override
-    public String generateAccessToken(UserDetails userDetails, Map<String, Object> extraClaims) {
+    public String generateAccessToken(final UserDetails userDetails, final Map<String, Object> extraClaims) {
         return buildToken(userDetails, extraClaims, accessTokenExpiration, "access");
     }
 
     @Override
-    public String generateRefreshToken(UserDetails userDetails) {
+    public String generateRefreshToken(final UserDetails userDetails) {
         return generateRefreshToken(userDetails, new HashMap<>());
     }
 
     @Override
-    public String generateRefreshToken(UserDetails userDetails, Map<String, Object> extraClaims) {
+    public String generateRefreshToken(final UserDetails userDetails, final Map<String, Object> extraClaims) {
         return buildToken(userDetails, extraClaims, refreshTokenExpiration, "refresh");
     }
 
     @Override
-    public String generateResetToken(UserDetails userDetails) {
+    public String generateResetToken(final UserDetails userDetails) {
         return generateRefreshToken(userDetails, new HashMap<>());
     }
 
     @Override
-    public String generateResetToken(UserDetails userDetails, Map<String, Object> extraClaims) {
+    public String generateResetToken(final UserDetails userDetails, final Map<String, Object> extraClaims) {
         return buildToken(userDetails, extraClaims, resetTokenExpiration, "reset");
     }
 
     @Override
-    public Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(final String token) {
         return Jwts
                 .parser()
                 .verifyWith(secretKey)
@@ -78,7 +78,7 @@ public class JwtService implements IJwtService {
                 .getPayload();
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaim(final String token, final Function<Claims, T> claimsResolver) {
         try {
             final Claims claims = extractAllClaims(token);
             if (claims == null) {
@@ -96,17 +96,17 @@ public class JwtService implements IJwtService {
 
 
     @Override
-    public String extractUsername(String token) {
+    public String extractUsername(final String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     @Override
-    public Date extractExpiration(String token) {
+    public Date extractExpiration(final String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
     @Override
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(final String token, UserDetails userDetails) {
         try {
             final String username = extractUsername(token);
             return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
@@ -116,7 +116,7 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(final String token) {
         try {
             return extractExpiration(token).before(new Date());
         } catch (Exception e) {
@@ -125,7 +125,7 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public SecretKey generateSecretKey(String secretKeyString) {
+    public SecretKey generateSecretKey(final String secretKeyString) {
         final byte[] keyBytes = Decoders.BASE64.decode(secretKeyString);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -145,7 +145,12 @@ public class JwtService implements IJwtService {
         return resetTokenExpiration;
     }
 
-    private String buildToken(UserDetails userDetails, Map<String, Object> extraClaims, long expiration, String tokenType) {
+    private String buildToken(
+            final UserDetails userDetails,
+            final Map<String, Object> extraClaims,
+            final long expiration,
+            final String tokenType
+    ) {
         return Jwts.builder()
                 .claims()
                 .subject(userDetails.getUsername())
