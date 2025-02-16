@@ -15,9 +15,13 @@ spring:
           jwk-set-uri: ${JWT_JWK_SET_URI}
 
 jwt:
-  key: ${JWT_KEY}
-  access-token-expiration: 3600000
-  refresh-token-expiration: 86400000
+  secret: ${JWT_KEY}
+  access-token:
+    expiration: 3600000
+  refresh-token:
+    expiration: 604800000
+  reset-token:
+    expiration: 3600000
 
 springdoc:
   api-docs:
