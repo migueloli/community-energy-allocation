@@ -7,6 +7,7 @@ import com.ilo.energyallocation.user.dto.RefreshTokenRequestDTO;
 import com.ilo.energyallocation.user.dto.ResetPasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.TokenResponseDTO;
 import com.ilo.energyallocation.user.service.interfaces.IAuthenticationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,31 +23,31 @@ public class AuthController {
     private final IAuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponseDTO> login(@RequestBody final LoginRequestDTO loginRequest) {
+    public ResponseEntity<TokenResponseDTO> login(@Valid @RequestBody final LoginRequestDTO loginRequest) {
         final TokenResponseDTO token = authenticationService.authenticateAndGenerateToken(loginRequest);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponseDTO> refreshToken(@RequestBody final RefreshTokenRequestDTO refreshTokenRequest) {
+    public ResponseEntity<TokenResponseDTO> refreshToken(@Valid @RequestBody final RefreshTokenRequestDTO refreshTokenRequest) {
         final TokenResponseDTO token = authenticationService.refreshToken(refreshTokenRequest.getRefreshToken());
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody final LogoutRequestDTO logoutRequest) {
+    public ResponseEntity<?> logout(@Valid @RequestBody final LogoutRequestDTO logoutRequest) {
         authenticationService.logout(logoutRequest.getRefreshToken());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody final ForgotPasswordRequestDTO forgotPasswordRequest) {
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody final ForgotPasswordRequestDTO forgotPasswordRequest) {
         authenticationService.initiatePasswordReset(forgotPasswordRequest.getEmail());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody final ResetPasswordRequestDTO resetPasswordRequest) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody final ResetPasswordRequestDTO resetPasswordRequest) {
         authenticationService.resetPassword(resetPasswordRequest.getToken(), resetPasswordRequest.getNewPassword());
         return ResponseEntity.ok().build();
     }
