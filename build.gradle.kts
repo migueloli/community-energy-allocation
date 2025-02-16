@@ -47,6 +47,8 @@ dependencies {
 
 	// Lombok
 	implementation(libs.lombok)
+	annotationProcessor(libs.lombok)
+	testAnnotationProcessor(libs.lombok)
 
 	// MapStruct
 	implementation(libs.mapstruct)
