@@ -1,5 +1,6 @@
 package com.ilo.energyallocation.user.controller;
 
+import com.ilo.energyallocation.common.ratelimit.RateLimit;
 import com.ilo.energyallocation.user.dto.ChangePasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.UserRegistrationRequestDTO;
 import com.ilo.energyallocation.user.dto.UserResponseDTO;
@@ -28,23 +29,27 @@ public class UserController {
     private final UserMapper userMapper;
 
     @PostMapping("/register")
+    @RateLimit
     public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody final UserRegistrationRequestDTO registrationDTO) {
         final IloUser createdUser = userService.createUser(registrationDTO);
         return ResponseEntity.ok(userMapper.toDTO(createdUser));
     }
 
     @GetMapping("/me")
+    @RateLimit
     public ResponseEntity<UserResponseDTO> getCurrentUser(@AuthenticationPrincipal final IloUser user) {
         return ResponseEntity.ok(userMapper.toDTO(user));
     }
 
     @PutMapping("/me")
+    @RateLimit
     public ResponseEntity<UserResponseDTO> updateUser(@AuthenticationPrincipal final IloUser user, @Valid @RequestBody final UserUpdateRequestDTO updateDTO) {
         final IloUser updatedUser = userService.updateUser(user.getId(), updateDTO);
         return ResponseEntity.ok(userMapper.toDTO(updatedUser));
     }
 
     @PostMapping("/change-password")
+    @RateLimit
     public ResponseEntity<?> changePassword(@AuthenticationPrincipal final IloUser user, @Valid @RequestBody final ChangePasswordRequestDTO changePasswordDTO) {
         userService.changePassword(user.getId(), changePasswordDTO);
         return ResponseEntity.ok().build();
@@ -52,6 +57,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimit
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable final String userId) {
         final IloUser user = userService.getUserById(userId);
         return ResponseEntity.ok(userMapper.toDTO(user));

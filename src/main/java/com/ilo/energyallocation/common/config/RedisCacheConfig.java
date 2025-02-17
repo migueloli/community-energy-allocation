@@ -1,4 +1,4 @@
-package com.ilo.energyallocation.common.cache;
+package com.ilo.energyallocation.common.config;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;

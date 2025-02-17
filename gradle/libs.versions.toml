@@ -8,6 +8,9 @@ mongodb = "5.3.1"
 lombok = "1.18.36"
 mapstruct = "1.6.3"
 apache-commons = "1.13.0"
+resilience4j = "2.3.0"
+bucket4j = "8.10.1"
+spring-boot-bucket4j = "0.12.8"
 mockito = "5.15.2"
 junit = "5.11.4"
 
@@ -18,17 +21,16 @@ spring-boot-starter-data-mongodb = { module = "org.springframework.boot:spring-b
 spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security", version.ref = "spring-boot" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "spring-boot" }
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "spring-boot" }
-spring-boot-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis", version.ref = "spring-boot" }
+spring-boot-starter-aop = { module = "org.springframework.boot:spring-boot-starter-aop", version.ref = "spring-boot" }
 
 # JWT
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
 jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 
-#DB
+# Data
 mongodb-driver = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongodb" }
-
-# CSV
+spring-boot-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis", version.ref = "spring-boot" }
 apache-commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "apache-commons" }
 
 # Lombok
@@ -37,6 +39,16 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 # MapStruct
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+
+# Resilience4j
+resilience4j-spring-boot = { module = "io.github.resilience4j:resilience4j-spring-boot3", version.ref = "resilience4j" }
+resilience4j-circuitbreaker = { module = "io.github.resilience4j:resilience4j-circuitbreaker", version.ref = "resilience4j" }
+resilience4j-timelimiter = { module = "io.github.resilience4j:resilience4j-timelimiter", version.ref = "resilience4j" }
+
+# Bucket4j
+bucket4j-core = { module = "com.bucket4j:bucket4j-core", version.ref = "bucket4j" }
+bucket4j-redis = { module = "com.bucket4j:bucket4j-redis", version.ref = "bucket4j" }
+bucket4j-spring-boot-starter = { module = "com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter", version.ref = "spring-boot-bucket4j" }
 
 # Spring OpenAPI
 springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "spring-openapi" }
@@ -54,3 +66,10 @@ mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+
+[bundles]
+spring-boot-starter = ["spring-boot-starter-web", "spring-boot-starter-data-mongodb", "spring-boot-starter-security", "spring-boot-starter-validation", "spring-boot-starter-actuator", "spring-boot-starter-aop"]
+spring-boot-test = ["spring-boot-starter-test", "spring-security-test"]
+resilience4j = ["resilience4j-spring-boot", "resilience4j-circuitbreaker", "resilience4j-timelimiter"]
+bucket4j = ["bucket4j-core", "bucket4j-redis", "bucket4j-spring-boot-starter"]
+
