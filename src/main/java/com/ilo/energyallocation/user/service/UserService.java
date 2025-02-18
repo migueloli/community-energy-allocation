@@ -33,7 +33,8 @@ public class UserService implements IUserService {
 
     @Override
     public UserResponseDTO findByUsernameOrEmail(final String username) {
-        return userMapper.toDTO(userRepository.findByUsernameOrEmail(username, username).orElseThrow(() -> new UserNotFoundException("User not found with username: " + username)));
+        return userMapper.toDTO(userRepository.findByUsernameOrEmail(username, username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username)));
     }
 
     @Override
@@ -91,6 +92,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserResponseDTO findById(final String userId) {
-        return userMapper.toDTO(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User " + "not" + " found with id: " + userId)));
+        return userMapper.toDTO(userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User " + "not" + " found with id: " + userId)));
     }
 }

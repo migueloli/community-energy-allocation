@@ -28,7 +28,15 @@ class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable) // Disable CSRF for simplicity in API usage for testing
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).authorizeHttpRequests(auths -> auths.requestMatchers("/api/public/**").permitAll().requestMatchers("/api/users/register", "/api/auth/login").permitAll().requestMatchers("/api/meter-readings/upload").hasRole("ADMIN").requestMatchers("/api/allocate").hasRole("ADMIN").requestMatchers("/api/batch-import").hasRole("ADMIN").anyRequest().authenticated()).formLogin(form -> form.loginPage("/login").permitAll()).logout(LogoutConfigurer::permitAll).build();
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).authorizeHttpRequests(
+                        auths -> auths.requestMatchers("/api/public/**").permitAll().requestMatchers(
+                                        "/api/users/register", "/api/auth/login").permitAll().requestMatchers(
+                                        "/api/meter-readings/upload").hasRole("ADMIN").requestMatchers("/api/allocate"
+                                ).hasRole(
+                                        "ADMIN").requestMatchers("/api/batch-import").hasRole("ADMIN").anyRequest()
+                                .authenticated()).formLogin(form -> form.loginPage("/login").permitAll()).logout(
+                        LogoutConfigurer::permitAll).build();
     }
 
     @Bean

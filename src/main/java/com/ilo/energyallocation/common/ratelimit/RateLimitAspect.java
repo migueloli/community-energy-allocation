@@ -56,7 +56,12 @@ public class RateLimitAspect {
     }
 
     private Bucket resolveBucket(String key) {
-        return proxyManager.builder().build(key,
-                () -> BucketConfiguration.builder().addLimit(Bandwidth.builder().capacity(rateLimitProperties.getCapacity()).refillGreedy(rateLimitProperties.getCapacity(), rateLimitProperties.getDuration()).build()).build());
+        return proxyManager.builder().build(
+                key,
+                () -> BucketConfiguration.builder().addLimit(Bandwidth.builder().capacity(
+                                        rateLimitProperties.getCapacity())
+                                .refillGreedy(rateLimitProperties.getCapacity(), rateLimitProperties.getDuration()).build())
+                        .build()
+        );
     }
 }

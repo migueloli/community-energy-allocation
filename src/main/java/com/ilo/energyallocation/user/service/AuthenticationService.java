@@ -32,7 +32,11 @@ public class AuthenticationService implements IAuthenticationService {
         // or use a OAuth2 library to handle token management.
         try {
             final Authentication authentication =
-                    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    loginRequest.getUsername(),
+                                    loginRequest.getPassword()
+                            ));
 
             final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             return generateTokenResponse(userDetails);
@@ -100,6 +104,7 @@ public class AuthenticationService implements IAuthenticationService {
         final String refreshToken = jwtService.generateRefreshToken(userDetails);
         final long expiresIn = jwtService.getAccessTokenExpiration();
 
-        return TokenResponseDTO.builder().accessToken(accessToken).refreshToken(refreshToken).tokenType("Bearer").expiresIn(expiresIn).build();
+        return TokenResponseDTO.builder().accessToken(accessToken).refreshToken(refreshToken).tokenType("Bearer")
+                .expiresIn(expiresIn).build();
     }
 }
