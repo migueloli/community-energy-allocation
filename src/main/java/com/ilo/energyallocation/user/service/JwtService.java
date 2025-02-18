@@ -26,12 +26,10 @@ public class JwtService implements IJwtService {
     private final long resetTokenExpiration;
     private final SecretKey secretKey;
 
-    public JwtService(
-            @Value("${jwt.secret}") String secretKeyString,
-            @Value("${jwt.access-token.expiration}") long accessTokenExpiration,
-            @Value("${jwt.refresh-token.expiration}") long refreshTokenExpiration,
-            @Value("${jwt.reset-token.expiration}") long resetTokenExpiration
-    ) {
+    public JwtService(@Value("${jwt.secret}") String secretKeyString,
+                      @Value("${jwt.access-token.expiration}") long accessTokenExpiration, @Value("${jwt" + ".refresh"
+                    + "-token.expiration}") long refreshTokenExpiration,
+                      @Value("${jwt.reset-token.expiration}") long resetTokenExpiration) {
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
         this.resetTokenExpiration = resetTokenExpiration;
@@ -70,12 +68,7 @@ public class JwtService implements IJwtService {
 
     @Override
     public Claims extractAllClaims(final String token) {
-        return Jwts
-                .parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     }
 
     public <T> T extractClaim(final String token, final Function<Claims, T> claimsResolver) {
@@ -145,21 +138,8 @@ public class JwtService implements IJwtService {
         return resetTokenExpiration;
     }
 
-    private String buildToken(
-            final UserDetails userDetails,
-            final Map<String, Object> extraClaims,
-            final long expiration,
-            final String tokenType
-    ) {
-        return Jwts.builder()
-                .claims()
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .add("tokenType", tokenType)
-                .add(extraClaims)
-                .and()
-                .signWith(secretKey)
-                .compact();
+    private String buildToken(final UserDetails userDetails, final Map<String, Object> extraClaims,
+                              final long expiration, final String tokenType) {
+        return Jwts.builder().claims().subject(userDetails.getUsername()).issuedAt(new Date(System.currentTimeMillis())).expiration(new Date(System.currentTimeMillis() + expiration)).add("tokenType", tokenType).add(extraClaims).and().signWith(secretKey).compact();
     }
 }

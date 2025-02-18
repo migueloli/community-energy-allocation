@@ -27,9 +27,8 @@ public class RateLimitAspect {
     private final RateLimitProperties rateLimitProperties;
 
     private String getClientIp(ProceedingJoinPoint joinPoint) {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
-                .currentRequestAttributes())
-                .getRequest();
+        HttpServletRequest request =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
         String clientIp = request.getHeader("X-Forwarded-For");
         if (clientIp == null || clientIp.isEmpty()) {
@@ -57,13 +56,7 @@ public class RateLimitAspect {
     }
 
     private Bucket resolveBucket(String key) {
-        return proxyManager.builder().build(key, () ->
-                BucketConfiguration.builder()
-                        .addLimit(Bandwidth.builder()
-                                .capacity(rateLimitProperties.getCapacity())
-                                .refillGreedy(rateLimitProperties.getCapacity(), rateLimitProperties.getDuration())
-                                .build())
-                        .build()
-        );
+        return proxyManager.builder().build(key,
+                () -> BucketConfiguration.builder().addLimit(Bandwidth.builder().capacity(rateLimitProperties.getCapacity()).refillGreedy(rateLimitProperties.getCapacity(), rateLimitProperties.getDuration()).build()).build());
     }
 }

@@ -31,9 +31,8 @@ public class AuthenticationService implements IAuthenticationService {
         // e.g. store them in a database and validate them when refreshing tokens.
         // or use a OAuth2 library to handle token management.
         try {
-            final Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-            );
+            final Authentication authentication =
+                    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
             final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             return generateTokenResponse(userDetails);
@@ -93,10 +92,7 @@ public class AuthenticationService implements IAuthenticationService {
             throw new TokenException("Invalid or expired reset token");
         }
 
-        userService.changePassword(
-                user.getId(),
-                ChangePasswordRequestDTO.builder().newPassword(newPassword).build()
-        );
+        userService.changePassword(user.getId(), ChangePasswordRequestDTO.builder().newPassword(newPassword).build());
     }
 
     private TokenResponseDTO generateTokenResponse(final UserDetails userDetails) {
@@ -104,11 +100,6 @@ public class AuthenticationService implements IAuthenticationService {
         final String refreshToken = jwtService.generateRefreshToken(userDetails);
         final long expiresIn = jwtService.getAccessTokenExpiration();
 
-        return TokenResponseDTO.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .tokenType("Bearer")
-                .expiresIn(expiresIn)
-                .build();
+        return TokenResponseDTO.builder().accessToken(accessToken).refreshToken(refreshToken).tokenType("Bearer").expiresIn(expiresIn).build();
     }
 }

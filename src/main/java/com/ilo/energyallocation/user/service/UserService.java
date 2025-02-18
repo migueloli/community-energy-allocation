@@ -27,14 +27,13 @@ public class UserService implements IUserService {
 
     @Override
     public IloUser loadUserByUsername(final String username) {
-        return userRepository.findByUsernameOrEmail(username, username)
-                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+        return userRepository.findByUsernameOrEmail(username, username).orElseThrow(() -> new UserNotFoundException(
+                "User not found with username: " + username));
     }
 
     @Override
     public UserResponseDTO findByUsernameOrEmail(final String username) {
-        return userMapper.toDTO(userRepository.findByUsernameOrEmail(username, username)
-                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username)));
+        return userMapper.toDTO(userRepository.findByUsernameOrEmail(username, username).orElseThrow(() -> new UserNotFoundException("User not found with username: " + username)));
     }
 
     @Override
@@ -61,8 +60,9 @@ public class UserService implements IUserService {
 
     @Override
     public UserResponseDTO updateUser(final String userId, final UserUpdateRequestDTO updateDTO) {
-        final IloUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+        final IloUser user =
+                userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not " + "found " +
+                        "with" + " id: " + userId));
 
         if (updateDTO.getEmail() != null && !updateDTO.getEmail().trim().isEmpty()) {
             user.setEmail(updateDTO.getEmail().trim());
@@ -77,8 +77,9 @@ public class UserService implements IUserService {
 
     @Override
     public void changePassword(final String userId, final ChangePasswordRequestDTO changePasswordDTO) {
-        final IloUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+        final IloUser user =
+                userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not " + "found " +
+                        "with" + " id: " + userId));
 
         if (!passwordEncoder.matches(changePasswordDTO.getCurrentPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Current password is incorrect");
@@ -90,7 +91,6 @@ public class UserService implements IUserService {
 
     @Override
     public UserResponseDTO findById(final String userId) {
-        return userMapper.toDTO(userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId)));
+        return userMapper.toDTO(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User " + "not" + " found with id: " + userId)));
     }
 }
