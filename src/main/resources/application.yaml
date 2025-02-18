@@ -63,3 +63,12 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
+    tagsSorter: alpha
+    defaultModelsExpandDepth: -1
+  info:
+    title: ILO Community Energy Allocation API
+    version: 1.0.0
+    description: API documentation for the ILO Community Energy Allocation system
+    contact:
+      name: Development Team
+      email: dev@ilo.com
