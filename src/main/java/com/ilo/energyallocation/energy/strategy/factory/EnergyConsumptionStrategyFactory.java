@@ -4,8 +4,8 @@ import com.ilo.energyallocation.energy.strategy.CommunityEnergyStrategy;
 import com.ilo.energyallocation.energy.strategy.GridEnergyStrategy;
 import com.ilo.energyallocation.energy.strategy.PreferenceConsumptionStrategy;
 import com.ilo.energyallocation.energy.strategy.SelfProducedEnergyStrategy;
+import com.ilo.energyallocation.energy.strategy.interfaces.DynamicEnergyConsumptionStrategy;
 import com.ilo.energyallocation.energy.strategy.interfaces.EnergyConsumptionStrategy;
-import com.ilo.energyallocation.energy.strategy.interfaces.RenewableEnergyStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ public class EnergyConsumptionStrategyFactory {
     private final PreferenceConsumptionStrategy preferenceStrategy;
     private final SelfProducedEnergyStrategy selfProducedStrategy;
     private final CommunityEnergyStrategy communityStrategy;
-    private final List<RenewableEnergyStrategy> renewableStrategies;
+    private final List<DynamicEnergyConsumptionStrategy> renewableStrategies;
     private final GridEnergyStrategy gridStrategy;
 
     public List<EnergyConsumptionStrategy> getStrategiesInPriorityOrder() {
@@ -31,7 +31,8 @@ public class EnergyConsumptionStrategyFactory {
 
         // Add renewable strategies sorted by current cost
         List<EnergyConsumptionStrategy> sortedRenewableStrategies =
-                renewableStrategies.stream().sorted(Comparator.comparingDouble(RenewableEnergyStrategy::getCurrentCost))
+                renewableStrategies.stream().sorted(
+                                Comparator.comparingDouble(DynamicEnergyConsumptionStrategy::getCurrentCost))
                         .collect(Collectors.toList());
         strategies.addAll(sortedRenewableStrategies);
 

@@ -1,5 +1,6 @@
 package com.ilo.energyallocation.energy.controller;
 
+import com.ilo.energyallocation.common.exception.dto.ErrorResponse;
 import com.ilo.energyallocation.energy.dto.CommunityEnergyResponseDTO;
 import com.ilo.energyallocation.energy.dto.CommunityEnergyShareRequestDTO;
 import com.ilo.energyallocation.energy.service.CommunityEnergyService;
@@ -42,11 +43,22 @@ public class CommunityEnergyController {
                             responseCode = "201", description = "Energy successfully shared",
                             content = @Content(schema = @Schema(implementation = CommunityEnergyResponseDTO.class))
                     ),
-                    @ApiResponse(responseCode = "400", description = "Invalid energy amount"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "422", description = "Insufficient energy to share"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(
+                            responseCode = "400", description = "Invalid energy amount",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
             }
     )
     @PostMapping("/share")
@@ -63,10 +75,22 @@ public class CommunityEnergyController {
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "Available energy retrieved successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(
+                            responseCode = "200", description = "Available energy retrieved successfully",
+                            content = @Content(schema = @Schema(implementation = double.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
             }
     )
     @GetMapping("/available")
@@ -79,11 +103,26 @@ public class CommunityEnergyController {
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "Contributions retrieved successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "404", description = "No contributions found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(
+                            responseCode = "200", description = "Contributions retrieved successfully",
+                            content = @Content(schema = @Schema(implementation = CommunityEnergyResponseDTO.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404", description = "No contributions found",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
             }
     )
     @GetMapping("/contributions")

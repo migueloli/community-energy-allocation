@@ -1,10 +1,13 @@
 package com.ilo.energyallocation.energy.controller;
 
+import com.ilo.energyallocation.common.exception.dto.ErrorResponse;
 import com.ilo.energyallocation.energy.dto.EnergyProductionRequestDTO;
 import com.ilo.energyallocation.energy.dto.EnergyProductionResponseDTO;
 import com.ilo.energyallocation.energy.service.EnergyProductionService;
 import com.ilo.energyallocation.user.model.IloUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -36,13 +39,34 @@ public class EnergyProductionController {
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "201", description = "Production logged successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid production data"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "422", description = "Invalid energy values"),
-                    @ApiResponse(responseCode = "429", description = "Too many requests"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(
+                            responseCode = "201", description = "Production logged successfully",
+                            content = @Content(schema = @Schema(implementation = EnergyProductionResponseDTO.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400", description = "Invalid production data",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "422", description = "Invalid energy values",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "429", description = "Too many requests",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
             }
     )
     @PostMapping
@@ -59,12 +83,34 @@ public class EnergyProductionController {
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "Production history retrieved"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "404", description = "No production history found"),
-                    @ApiResponse(responseCode = "429", description = "Too many requests"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(
+                            responseCode = "200", description = "Production history retrieved",
+                            content = @Content(schema = @Schema(implementation = EnergyProductionResponseDTO.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400", description = "Invalid production data",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404", description = "No production history found",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "429", description = "Too many requests",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
             }
     )
     @GetMapping

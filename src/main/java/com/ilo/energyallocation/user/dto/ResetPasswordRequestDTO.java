@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "Password reset request")
 public class ResetPasswordRequestDTO {
     @Schema(description = "Password reset token received via email", example = "abc123def456")

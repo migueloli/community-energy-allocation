@@ -12,8 +12,8 @@ import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "User profile response data")
 public class UserResponseDTO {
     @Schema(description = "Unique identifier", example = "507f1f77bcf86cd799439011")

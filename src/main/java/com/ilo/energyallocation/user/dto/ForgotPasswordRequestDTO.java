@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "Forgot password request")
 public class ForgotPasswordRequestDTO {
     @Schema(description = "User's registered email address", example = "john.doe@example.com")

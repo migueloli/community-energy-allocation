@@ -1,5 +1,8 @@
 package com.ilo.energyallocation.common.exception;
 
+import com.ilo.energyallocation.common.exception.dto.ErrorResponse;
+import com.ilo.energyallocation.common.exception.dto.FieldValidationError;
+import com.ilo.energyallocation.common.exception.dto.ValidationErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,26 +63,5 @@ public class GlobalExceptionHandler {
                 "error occurred"
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Schema(name = "ErrorResponse", description = "Standard error response structure")
-    public record ErrorResponse(
-            @Schema(description = "HTTP status code", example = "400") int status,
-            @Schema(description = "Error message details", example = "Invalid input provided") String message
-    ) {
-    }
-
-    @Schema(name = "ValidationErrorResponse", description = "Validation error response structure")
-    public record ValidationErrorResponse(
-            @Schema(description = "HTTP status code", example = "400") int status,
-            @Schema(description = "List of field validation errors") List<FieldValidationError> errors
-    ) {
-    }
-
-    @Schema(name = "FieldValidationError", description = "Field-specific validation error")
-    public record FieldValidationError(
-            @Schema(description = "Field name", example = "email") String field,
-            @Schema(description = "Error message", example = "must not be blank") String message
-    ) {
     }
 }

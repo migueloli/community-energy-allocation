@@ -1,5 +1,6 @@
 package com.ilo.energyallocation.common.config;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +15,14 @@ import java.time.Duration;
 public class RedisCacheConfig {
 
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        RedisCacheConfiguration config =
-                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(60))
-                        .disableCachingNullValues();
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        RedisCacheConfiguration config = RedisCacheConfiguration
+                .defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(60)) // Cache TTL
+                .disableCachingNullValues(); // Don't cache null values
 
-        return RedisCacheManager.builder(connectionFactory).cacheDefaults(config).build();
+        return RedisCacheManager.builder(connectionFactory)
+                .cacheDefaults(config)
+                .build();
     }
 }

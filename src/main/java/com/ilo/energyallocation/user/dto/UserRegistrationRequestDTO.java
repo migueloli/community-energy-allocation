@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "User registration request")
 public class UserRegistrationRequestDTO {
     @Schema(description = "Desired username", example = "john.doe")

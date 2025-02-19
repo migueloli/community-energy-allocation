@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "Login request credentials")
 public class LoginRequestDTO {
     @Schema(description = "User's username", example = "john.doe")

@@ -5,18 +5,23 @@ import com.ilo.energyallocation.energy.model.CommunityEnergy;
 import com.ilo.energyallocation.energy.model.EnergySource;
 import com.ilo.energyallocation.energy.model.EnergyType;
 import com.ilo.energyallocation.energy.repository.CommunityEnergyRepository;
+import com.ilo.energyallocation.energy.repository.EnergyCostRepository;
 import com.ilo.energyallocation.energy.strategy.interfaces.DynamicEnergyConsumptionStrategy;
 import com.ilo.energyallocation.user.model.IloUser;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
-public class CommunityEnergyStrategy implements DynamicEnergyConsumptionStrategy {
+public class CommunityEnergyStrategy extends DynamicEnergyConsumptionStrategy {
     private final CommunityEnergyRepository communityEnergyRepository;
+
+    public CommunityEnergyStrategy(
+            EnergyCostRepository costRepository, CommunityEnergyRepository communityEnergyRepository) {
+        super(costRepository);
+        this.communityEnergyRepository = communityEnergyRepository;
+    }
 
     @Override
     public EnergyConsumptionResponseDTO consumeEnergy(double requiredAmount, IloUser user) {
@@ -60,5 +65,10 @@ public class CommunityEnergyStrategy implements DynamicEnergyConsumptionStrategy
             }
             communityEnergyRepository.save(pool);
         }
+    }
+
+    @Override
+    public EnergyType getEnergyType() {
+        return EnergyType.COMMUNITY;
     }
 }

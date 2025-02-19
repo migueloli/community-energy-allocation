@@ -4,6 +4,7 @@ import com.ilo.energyallocation.energy.dto.EnergyConsumptionHistoryRequestDTO;
 import com.ilo.energyallocation.energy.dto.EnergyConsumptionHistoryResponseDTO;
 import com.ilo.energyallocation.energy.dto.EnergyConsumptionResponseDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IEnergyConsumptionHistoryService {
@@ -12,5 +13,6 @@ public interface IEnergyConsumptionHistoryService {
     List<EnergyConsumptionHistoryResponseDTO> getUserLogsByPeriod(
             String userId, EnergyConsumptionHistoryRequestDTO dateRange);
 
-    void logConsumption(String userId, double requestedAmount, EnergyConsumptionResponseDTO result);
+    void logConsumption(
+            String userId, double requestedAmount, EnergyConsumptionResponseDTO result, LocalDateTime timestamp);
 }

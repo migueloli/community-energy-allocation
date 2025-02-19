@@ -9,20 +9,25 @@ import com.ilo.energyallocation.energy.model.EnergyType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class BillingStrategyFactory {
     private final SelfProducedBillingStrategy selfProducedStrategy;
     private final CommunityBillingStrategy communityStrategy;
-    private final RenewableBillingStrategy renewableStrategy;
+    private final List<RenewableBillingStrategy> renewableStrategies;
     private final GridBillingStrategy gridStrategy;
 
     public BillingStrategy getStrategy(EnergyType sourceType) {
         return switch (sourceType) {
-            case SOLAR, WIND, HYDRO, BIOMASS -> renewableStrategy;
+            case SOLAR, WIND, HYDRO, BIOMASS -> renewableStrategies.stream()
+                    .filter(strategy -> strategy.getEnergyType() == sourceType)
+                    .findFirst()
+                    .orElseThrow();
             case COMMUNITY -> communityStrategy;
             case GRID -> gridStrategy;
-            default -> selfProducedStrategy;
+            case SELF_PRODUCED -> selfProducedStrategy;
         };
     }
 }

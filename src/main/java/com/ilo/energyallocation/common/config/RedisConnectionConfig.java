@@ -17,7 +17,7 @@ public class RedisConnectionConfig {
     private final StatefulRedisConnection<String, byte[]> connection;
 
     public RedisConnectionConfig(RedisProperties redisProperties) {
-        this.redisClient = RedisClient.create(redisProperties.getUrl());
+        this.redisClient = RedisClient.create("redis://" + redisProperties.getHost() + ":" + redisProperties.getPort());
         RedisCodec<String, byte[]> codec = RedisCodec.of(StringCodec.UTF8, ByteArrayCodec.INSTANCE);
         this.connection = redisClient.connect(codec);
     }

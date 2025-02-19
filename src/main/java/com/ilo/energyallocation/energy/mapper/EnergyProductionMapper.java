@@ -20,8 +20,8 @@ public interface EnergyProductionMapper {
 
     EnergyAvailableDTO toAvailableEnergyDTO(EnergyAvailable energyAvailable);
 
-    @Mapping(target = "producedEnergy", source = "producedEnergy")
-    @Mapping(target = "availableEnergy", source = "availableEnergy")
+    @Mapping(target = "energyProduced", source = "energyProduced")
+    @Mapping(target = "energyAvailable", source = "energyAvailable")
     EnergyProductionResponseDTO toResponse(EnergyProduction production);
 
     List<EnergyProductionResponseDTO> toResponseList(List<EnergyProduction> productions);

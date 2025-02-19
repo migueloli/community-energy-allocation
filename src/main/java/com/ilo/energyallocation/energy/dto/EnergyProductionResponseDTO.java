@@ -4,20 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Builder
-@RequiredArgsConstructor
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class EnergyProductionResponseDTO {
     private String id;
     private String userId;
-    private EnergyProducedDTO producedEnergy;
+    private EnergyProducedDTO energyProduced;
     private double consumedEnergy;
-    private EnergyAvailableDTO availableEnergy;
+    private EnergyAvailableDTO energyAvailable;
     private LocalDateTime timestamp;
 }

@@ -1,5 +1,6 @@
 package com.ilo.energyallocation.energy.controller;
 
+import com.ilo.energyallocation.common.exception.dto.ErrorResponse;
 import com.ilo.energyallocation.energy.dto.EnergyConsumptionHistoryRequestDTO;
 import com.ilo.energyallocation.energy.dto.EnergyConsumptionHistoryResponseDTO;
 import com.ilo.energyallocation.energy.dto.EnergyConsumptionRequestDTO;
@@ -44,12 +45,30 @@ public class EnergyConsumptionController {
                             responseCode = "200", description = "Energy successfully consumed",
                             content = @Content(schema = @Schema(implementation = EnergyConsumptionResponseDTO.class))
                     ),
-                    @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "422", description = "Insufficient energy available"),
-                    @ApiResponse(responseCode = "429", description = "Too many requests"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(
+                            responseCode = "400", description = "Invalid request parameters",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "422", description = "Insufficient energy available",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "429", description = "Too many requests",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
             }
     )
     @PostMapping
@@ -57,7 +76,7 @@ public class EnergyConsumptionController {
             @AuthenticationPrincipal IloUser user,
             @Valid @RequestBody EnergyConsumptionRequestDTO request
     ) {
-        return consumptionService.consumeEnergy(request.getRequiredAmount(), user);
+        return consumptionService.consumeEnergy(request, user);
     }
 
     @Operation(
@@ -65,12 +84,31 @@ public class EnergyConsumptionController {
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "History retrieved successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "404", description = "No history found"),
-                    @ApiResponse(responseCode = "429", description = "Too many requests"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(
+                            responseCode = "200", description = "History retrieved successfully", content = @Content(
+                            schema = @Schema(implementation = EnergyConsumptionHistoryResponseDTO.class)
+                    )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404", description = "No history found",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "429", description = "Too many requests",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
             }
     )
     @GetMapping("/history")
@@ -83,13 +121,32 @@ public class EnergyConsumptionController {
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "Filtered history retrieved successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid date range"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "404", description = "No history found for date range"),
-                    @ApiResponse(responseCode = "429", description = "Too many requests"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(
+                            responseCode = "200", description = "Filtered history retrieved successfully",
+                            content = @Content(
+                                    schema = @Schema(implementation = EnergyConsumptionHistoryResponseDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404", description = "No history found",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "429", description = "Too many requests",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
             }
     )
     @GetMapping("/history/range")

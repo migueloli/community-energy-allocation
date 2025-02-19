@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "User profile update request")
 public class UserUpdateRequestDTO {
     @Schema(description = "New email address", example = "new.email@example.com")

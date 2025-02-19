@@ -25,6 +25,7 @@ public class EnergyProductionService implements IEnergyProductionService {
         EnergyProduction production = productionMapper.toEntity(request);
         production.setUserId(userId);
         production.setConsumedEnergy(0.0);
+        production.setTimestamp(request.getTimestamp());
         production.setEnergyAvailable(calculateAvailableEnergy(request.getProducedEnergy()));
 
         return productionMapper.toResponse(productionRepository.save(production));

@@ -3,6 +3,7 @@ package com.ilo.energyallocation.billing.controller;
 import com.ilo.energyallocation.billing.dto.BillingSummaryRequestDTO;
 import com.ilo.energyallocation.billing.dto.BillingSummaryResponseDTO;
 import com.ilo.energyallocation.billing.service.BillingService;
+import com.ilo.energyallocation.common.exception.dto.ErrorResponse;
 import com.ilo.energyallocation.user.model.IloUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,12 +38,30 @@ public class BillingController {
                             responseCode = "200", description = "Billing summary retrieved successfully",
                             content = @Content(schema = @Schema(implementation = BillingSummaryResponseDTO.class))
                     ),
-                    @ApiResponse(responseCode = "400", description = "Invalid date range"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden"),
-                    @ApiResponse(responseCode = "404", description = "No billing data found"),
-                    @ApiResponse(responseCode = "429", description = "Too many requests"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                    @ApiResponse(
+                            responseCode = "400", description = "Invalid date range",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Forbidden",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404", description = "No billing data found",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "429", description = "Too many requests",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
             }
     )
     @GetMapping("/summary")

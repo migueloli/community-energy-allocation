@@ -1,6 +1,6 @@
 package com.ilo.energyallocation.user.controller;
 
-import com.ilo.energyallocation.common.exception.GlobalExceptionHandler;
+import com.ilo.energyallocation.common.exception.dto.ErrorResponse;
 import com.ilo.energyallocation.common.ratelimit.RateLimit;
 import com.ilo.energyallocation.user.dto.ChangePasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.UserRegistrationRequestDTO;
@@ -48,14 +48,14 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "400", description = "Invalid input", content = @Content(
                             schema =
-                            @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)
+                            @Schema(implementation = ErrorResponse.class)
                     )
                     ), @ApiResponse(
                     responseCode = "409"
                     , description = "User already exists", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             ), @ApiResponse(
@@ -63,7 +63,7 @@ public class UserController {
                     "many" + " requests", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             )
@@ -91,14 +91,14 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "401", description = "Invalid credentials", content = @Content(
                             schema =
-                            @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)
+                            @Schema(implementation = ErrorResponse.class)
                     )
                     ), @ApiResponse(
                     responseCode = "429"
                     , description = "Too many requests", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             )
@@ -125,14 +125,14 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "401", description = "Invalid credentials", content = @Content(
                             schema =
-                            @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)
+                            @Schema(implementation = ErrorResponse.class)
                     )
                     ), @ApiResponse(
                     responseCode = "429"
                     , description = "Too many requests", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             )
@@ -167,7 +167,7 @@ public class UserController {
                     "Invalid " + "credentials", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             ), @ApiResponse(
@@ -175,7 +175,7 @@ public class UserController {
                     "many" + " requests", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             )
@@ -211,14 +211,14 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "401", description = "Invalid credentials", content = @Content(
                             schema =
-                            @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)
+                            @Schema(implementation = ErrorResponse.class)
                     )
                     ), @ApiResponse(
                     responseCode = "403"
                     , description = "Insufficient permissions", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             ), @ApiResponse(
@@ -226,7 +226,7 @@ public class UserController {
                     "User " + "not" + " found", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             ), @ApiResponse(
@@ -234,7 +234,7 @@ public class UserController {
                     "many" + " requests", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             )

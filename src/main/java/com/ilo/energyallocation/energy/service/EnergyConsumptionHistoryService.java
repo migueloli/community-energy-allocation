@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class EnergyConsumptionLogService implements IEnergyConsumptionHistoryService {
+public class EnergyConsumptionHistoryService implements IEnergyConsumptionHistoryService {
     private final EnergyConsumptionHistoryRepository energyConsumptionHistoryRepository;
     private final ConsumptionHistoryMapper consumptionHistoryMapper;
 
@@ -39,7 +39,8 @@ public class EnergyConsumptionLogService implements IEnergyConsumptionHistorySer
     }
 
     @Override
-    public void logConsumption(String userId, double requestedAmount, EnergyConsumptionResponseDTO result) {
+    public void logConsumption(
+            String userId, double requestedAmount, EnergyConsumptionResponseDTO result, LocalDateTime timestamp) {
         EnergyConsumptionHistory log = new EnergyConsumptionHistory();
         log.setUserId(userId);
         log.setRequestedEnergy(requestedAmount);

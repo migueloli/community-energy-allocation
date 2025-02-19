@@ -1,6 +1,6 @@
 package com.ilo.energyallocation.user.controller;
 
-import com.ilo.energyallocation.common.exception.GlobalExceptionHandler;
+import com.ilo.energyallocation.common.exception.dto.ErrorResponse;
 import com.ilo.energyallocation.common.ratelimit.RateLimit;
 import com.ilo.energyallocation.user.dto.ForgotPasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.LoginRequestDTO;
@@ -50,14 +50,14 @@ public class AuthController {
                     @ApiResponse(
                             responseCode = "401", description = "Invalid credentials", content = @Content(
                             schema =
-                            @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)
+                            @Schema(implementation = ErrorResponse.class)
                     )
                     ), @ApiResponse(
                     responseCode = "429"
                     , description = "Too many login attempts", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             ), @ApiResponse(
@@ -87,7 +87,7 @@ public class AuthController {
                     "token", content = @Content(
                     mediaType = "application/json", schema = @Schema(
                     implementation =
-                            GlobalExceptionHandler.ErrorResponse.class
+                            ErrorResponse.class
             )
             )
             ), @ApiResponse(
@@ -95,7 +95,7 @@ public class AuthController {
                     "many" + " requests", content = @Content(
                     mediaType = "application/json", schema = @Schema(
                     implementation
-                            = GlobalExceptionHandler.ErrorResponse.class
+                            = ErrorResponse.class
             )
             )
             )
@@ -124,7 +124,7 @@ public class AuthController {
                     description = "Invalid or expired refresh token", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             ), @ApiResponse(
@@ -132,7 +132,7 @@ public class AuthController {
                     "many" + " login attempts", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             ), @ApiResponse(
@@ -140,7 +140,7 @@ public class AuthController {
                     + " server error", content = @Content(
                     schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
             )
             )
@@ -172,7 +172,7 @@ public class AuthController {
                     content = @Content(
                             mediaType = "application/json", schema = @Schema(
                             implementation =
-                                    GlobalExceptionHandler.ErrorResponse.class
+                                    ErrorResponse.class
                     )
                     )
             ), @ApiResponse(
@@ -180,7 +180,7 @@ public class AuthController {
                     "Too many requests", content = @Content(
                     mediaType = "application/json", schema = @Schema(
                     implementation =
-                            GlobalExceptionHandler.ErrorResponse.class
+                            ErrorResponse.class
             )
             )
             )
@@ -209,13 +209,13 @@ public class AuthController {
                     responseCode = "400", description =
                     "Invalid or expired " + "token", content = @Content(
                     mediaType = "application/json", schema =
-            @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)
+            @Schema(implementation = ErrorResponse.class)
             )
             ), @ApiResponse(
                     responseCode = "429",
                     description = "Too many" + " requests", content = @Content(
                     mediaType = "application/json", schema =
-            @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class)
+            @Schema(implementation = ErrorResponse.class)
             )
             )
             }
