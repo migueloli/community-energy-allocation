@@ -5,7 +5,7 @@ import com.ilo.energyallocation.energy.model.CommunityEnergy;
 import com.ilo.energyallocation.energy.model.EnergySource;
 import com.ilo.energyallocation.energy.model.EnergyType;
 import com.ilo.energyallocation.energy.repository.CommunityEnergyRepository;
-import com.ilo.energyallocation.energy.strategy.interfaces.EnergyConsumptionStrategy;
+import com.ilo.energyallocation.energy.strategy.interfaces.DynamicEnergyConsumptionStrategy;
 import com.ilo.energyallocation.user.model.IloUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,8 +15,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class CommunityEnergyStrategy implements EnergyConsumptionStrategy {
-    private static final double COMMUNITY_ENERGY_COST = 0.05; // Discounted rate
+public class CommunityEnergyStrategy implements DynamicEnergyConsumptionStrategy {
     private final CommunityEnergyRepository communityEnergyRepository;
 
     @Override
@@ -37,7 +36,7 @@ public class CommunityEnergyStrategy implements EnergyConsumptionStrategy {
 
             result.setEnergyConsumed(energyToConsume);
             result.setSourcesUsed(Collections.singletonList(source));
-            result.setTotalCost(energyToConsume * COMMUNITY_ENERGY_COST);
+            result.setTotalCost(energyToConsume * getCurrentCost());
 
             // Mark consumed energy in the pool
             updateCommunityPool(energyToConsume, availablePool);

@@ -4,23 +4,16 @@ import com.ilo.energyallocation.energy.dto.EnergyConsumptionResponseDTO;
 import com.ilo.energyallocation.energy.model.EnergySource;
 import com.ilo.energyallocation.energy.model.EnergyType;
 import com.ilo.energyallocation.energy.repository.EnergyCostRepository;
-import com.ilo.energyallocation.energy.strategy.interfaces.RenewableEnergyStrategy;
+import com.ilo.energyallocation.energy.strategy.interfaces.DynamicEnergyConsumptionStrategy;
 import com.ilo.energyallocation.user.model.IloUser;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
 @Component
-public class SolarEnergyStrategy extends RenewableEnergyStrategy {
-    private static final double SOLAR_COST = 0.08;
-
+public class SolarEnergyStrategy extends DynamicEnergyConsumptionStrategy {
     public SolarEnergyStrategy(EnergyCostRepository costRepository) {
         super(costRepository);
-    }
-
-    @Override
-    public double getCurrentCost() {
-        return SOLAR_COST;
     }
 
     @Override
@@ -39,7 +32,7 @@ public class SolarEnergyStrategy extends RenewableEnergyStrategy {
 
         result.setEnergyConsumed(requiredAmount);
         result.setSourcesUsed(Collections.singletonList(source));
-        result.setTotalCost(requiredAmount * SOLAR_COST);
+        result.setTotalCost(requiredAmount * getCurrentCost());
 
         return result;
     }

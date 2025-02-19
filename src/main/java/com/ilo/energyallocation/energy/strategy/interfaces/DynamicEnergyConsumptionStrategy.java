@@ -7,7 +7,7 @@ import com.ilo.energyallocation.energy.repository.EnergyCostRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public abstract class RenewableEnergyStrategy implements EnergyConsumptionStrategy {
+public abstract class DynamicEnergyConsumptionStrategy implements EnergyConsumptionStrategy {
     private final EnergyCostRepository costRepository;
 
     public double getCurrentCost() {
