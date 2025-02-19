@@ -20,6 +20,7 @@ repositories {
     mavenCentral()
 }
 
+val mockitoAgent = configurations.create("mockitoAgent")
 dependencies {
     implementation(platform(SpringBootPlugin.BOM_COORDINATES))
 
@@ -32,9 +33,7 @@ dependencies {
     runtimeOnly(libs.jjwt.jackson)
 
     // Data
-    implementation(libs.mongodb.driver)
-    implementation(libs.spring.boot.redis)
-    implementation(libs.apache.commons.csv)
+    implementation(libs.opencsv)
 
     // Lombok
     implementation(libs.lombok)
@@ -58,9 +57,9 @@ dependencies {
     testImplementation(libs.bundles.spring.boot.test)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.mockito.core)
+    mockitoAgent(libs.mockito.core) { isTransitive = false }
 }
 
-val mockitoAgent = configurations.create("mockitoAgent")
 tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs(

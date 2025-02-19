@@ -6,11 +6,19 @@ spring:
     name: ILO Community Energy Allocation
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI}
-      database: ${SPRING_DATA_MONGODB_DB_NAME}
-  redis:
-    host: ${SPRING_REDIS_HOST:localhost}
-    port: ${SPRING_REDIS_PORT:6379}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://mongodb-service:27017/}
+      database: ${SPRING_DATA_MONGODB_DB_NAME:energydb}
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+  cache:
+    ttl:
+      energyPrices: 60m
+      energySources: 30m
+      userPreferences: 15m
+    type: redis
+    redis:
+      time-to-live: 1h
 
 jwt:
   secret: ${JWT_KEY}
@@ -47,15 +55,24 @@ resilience4j:
         maxAttempts: 3
         waitDuration: 100ms
 
+bucket4j:
+  enabled: true
+  filters:
+    - cache-name: buckets
+      url: /api.*
+      rate-limits:
+        - bandwidths:
+            - capacity: ${rate-limit.capacity:100}
+              time: 1
+              unit: MINUTES
+  cache-to-use: redis_sync
+  redis:
+    host: ${SPRING_REDIS_HOST:redis}
+    port: ${SPRING_REDIS_PORT:6379}
+
 rate-limit:
   capacity: 100
   duration: 1m
-cache:
-  ttl:
-    energyPrices: 60m
-    energySources: 30m
-    userPreferences: 15m
-
 
 springdoc:
   api-docs:
