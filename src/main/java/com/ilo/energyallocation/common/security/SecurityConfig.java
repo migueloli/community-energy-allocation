@@ -23,7 +23,6 @@ class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auths -> auths
-                        .requestMatchers("/api/**/public/**").permitAll()
                         .requestMatchers("/api-docs/**", "/swagger-ui.html", "swagger-ui/**").permitAll()
                         .requestMatchers("/api/v1/users/register", "/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/csv/upload").hasRole("ADMIN")

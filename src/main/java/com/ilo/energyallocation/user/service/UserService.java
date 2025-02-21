@@ -1,7 +1,6 @@
 package com.ilo.energyallocation.user.service;
 
 import com.ilo.energyallocation.common.exception.UserNotFoundException;
-import com.ilo.energyallocation.user.dto.ChangePasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.UserRegistrationRequestDTO;
 import com.ilo.energyallocation.user.dto.UserResponseDTO;
 import com.ilo.energyallocation.user.dto.UserUpdateRequestDTO;
@@ -16,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +48,9 @@ public class UserService implements IUserService {
         try {
             final IloUser newUser = userMapper.toEntity(registrationDTO);
             newUser.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
-            newUser.setRoles(Collections.singletonList(Role.USER));
+            if (newUser.getRoles() == null || newUser.getRoles().isEmpty()) {
+                newUser.setRoles(Collections.singletonList(Role.USER));
+            }
             return userMapper.toDTO(userRepository.save(newUser));
         } catch (DuplicateKeyException e) {
             if (e.getMessage().contains("username")) {
@@ -77,22 +80,15 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void changePassword(final String userId, final ChangePasswordRequestDTO changePasswordDTO) {
-        final IloUser user =
-                userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not " + "found " +
-                        "with" + " id: " + userId));
-
-        if (!passwordEncoder.matches(changePasswordDTO.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Current password is incorrect");
-        }
-
-        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
-        userRepository.save(user);
-    }
-
-    @Override
     public UserResponseDTO findById(final String userId) {
         return userMapper.toDTO(userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User " + "not" + " found with id: " + userId)));
+    }
+
+    @Override
+    public List<UserResponseDTO> findAllUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

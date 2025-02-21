@@ -1,5 +1,6 @@
 package com.ilo.energyallocation.energy.dto;
 
+import com.ilo.energyallocation.energy.model.EnergyType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +15,7 @@ import java.time.LocalDateTime;
 public class EnergyProductionResponseDTO {
     private String id;
     private String userId;
-    private EnergyProducedDTO energyProduced;
-    private double consumedEnergy;
-    private EnergyAvailableDTO energyAvailable;
+    private EnergyType energyType;
+    private double production;
     private LocalDateTime timestamp;
 }

@@ -2,7 +2,6 @@ package com.ilo.energyallocation.user.controller;
 
 import com.ilo.energyallocation.common.exception.dto.ErrorResponse;
 import com.ilo.energyallocation.common.ratelimit.RateLimit;
-import com.ilo.energyallocation.user.dto.ChangePasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.UserRegistrationRequestDTO;
 import com.ilo.energyallocation.user.dto.UserResponseDTO;
 import com.ilo.energyallocation.user.dto.UserUpdateRequestDTO;
@@ -28,11 +27,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/v1/api/users")
+@RequestMapping("/api/v1/users")
 @Tag(
         name = "Users", description =
-        "Endpoints for managing user profiles, including registration, profile updates, " + "and admin operations"
+        "Endpoints for managing user profiles and admin operations related to user profiles"
 )
 @RequiredArgsConstructor
 public class UserController {
@@ -154,51 +155,6 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Change password of current user", description = "Changes the password of the authenticated "
-            + "user"
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200", description = "Password successfully updated", content
-                            = @Content(mediaType = "application/json")
-                    ), @ApiResponse(
-                    responseCode = "401", description =
-                    "Invalid " + "credentials", content = @Content(
-                    schema = @Schema(
-                            implementation =
-                                    ErrorResponse.class
-                    )
-            )
-            ), @ApiResponse(
-                    responseCode = "429", description = "Too " +
-                    "many" + " requests", content = @Content(
-                    schema = @Schema(
-                            implementation =
-                                    ErrorResponse.class
-                    )
-            )
-            )
-            }
-    )
-    @PostMapping("/change-password")
-    @RateLimit
-    public ResponseEntity<?> changePassword(
-            @AuthenticationPrincipal final IloUser user, @Parameter(
-                    description =
-                            "Password change details", required = true, content = @Content(
-                    schema = @Schema(
-                            implementation =
-                                    ChangePasswordRequestDTO.class
-                    )
-            )
-            ) @Valid @RequestBody final ChangePasswordRequestDTO changePasswordDTO
-    ) {
-        userService.changePassword(user.getId(), changePasswordDTO);
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(
             summary = "[Admin] Get user by ID", description = "Retrieves user profile data by ID. Only accessible "
             + "by administrators"
     )
@@ -250,5 +206,39 @@ public class UserController {
             ) @PathVariable final String userId
     ) {
         return ResponseEntity.ok(userService.findById(userId));
+    }
+
+    @Operation(
+            summary = "[Admin] Get all users",
+            description = "Retrieves all user profiles. Only accessible by administrators"
+    )
+    @ApiResponses(
+            {
+                    @ApiResponse(
+                            responseCode = "200", description = "Users successfully retrieved",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = UserResponseDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401", description = "Invalid credentials",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "403", description = "Insufficient permissions",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "429", description = "Too many requests",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+                    )
+            }
+    )
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @RateLimit
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        return ResponseEntity.ok(userService.findAllUsers());
     }
 }

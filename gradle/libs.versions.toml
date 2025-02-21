@@ -11,6 +11,7 @@ resilience4j = "2.3.0"
 bucket4j = "8.10.1"
 mockito = "5.15.2"
 junit = "5.11.4"
+mongock = "5.5.0"
 
 [libraries]
 # Spring boot
@@ -47,6 +48,11 @@ resilience4j-timelimiter = { module = "io.github.resilience4j:resilience4j-timel
 bucket4j-core = { module = "com.bucket4j:bucket4j-core", version.ref = "bucket4j" }
 bucket4j-redis = { module = "com.bucket4j:bucket4j-redis", version.ref = "bucket4j" }
 
+# Mongock
+mongock-springboot = { module = "io.mongock:mongock-springboot", version.ref = "mongock" }
+mongock-core = { module = "io.mongock:mongock-core", version.ref = "mongock" }
+mongock-mongodb-driver = { module = "io.mongock:mongodb-springdata-v4-driver", version.ref = "mongock" }
+
 # Spring OpenAPI
 springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "spring-openapi" }
 
@@ -69,3 +75,4 @@ spring-boot-starter = ["spring-boot-starter-web", "spring-boot-starter-data-mong
 spring-boot-test = ["spring-boot-starter-test", "spring-security-test"]
 resilience4j = ["resilience4j-spring-boot", "resilience4j-circuitbreaker", "resilience4j-timelimiter"]
 bucket4j = ["bucket4j-core", "bucket4j-redis"]
+mongock = ["mongock-springboot", "mongock-core", "mongock-mongodb-driver"]

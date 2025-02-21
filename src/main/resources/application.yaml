@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
@@ -28,6 +28,20 @@ jwt:
     expiration: 604800000
   reset-token:
     expiration: 3600000
+
+logging:
+  level:
+    root: DEBUG
+    com.ilo.energyallocation: DEBUG
+    org.springframework: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.cache: DEBUG
+    org.springframework.web: DEBUG
+    io.mongock: DEBUG
+    io.lettuce: DEBUG
+    org.mongodb: DEBUG
+
 
 resilience4j:
   circuitbreaker:
@@ -89,3 +103,8 @@ springdoc:
     contact:
       name: Development Team
       email: dev@ilo.com
+
+mongock:
+  enabled: true
+  transaction-enabled: false
+  migration-scan-package: com.ilo.energyallocation.migrations

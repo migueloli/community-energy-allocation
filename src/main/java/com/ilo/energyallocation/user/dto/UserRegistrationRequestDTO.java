@@ -1,6 +1,8 @@
 package com.ilo.energyallocation.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ilo.energyallocation.user.model.EnergyPreference;
+import com.ilo.energyallocation.user.model.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -30,6 +34,10 @@ public class UserRegistrationRequestDTO {
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
+
+    @Schema(description = "User roles", example = "[\"USER\", \"ADMIN\"]")
+    @JsonIgnore
+    private List<Role> roles;
 
     @Schema(description = "Energy preferences configuration")
     private EnergyPreference preference;

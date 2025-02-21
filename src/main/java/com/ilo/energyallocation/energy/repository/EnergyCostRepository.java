@@ -5,9 +5,12 @@ import com.ilo.energyallocation.energy.model.EnergyType;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
 public interface EnergyCostRepository extends MongoRepository<EnergyCost, String> {
     Optional<EnergyCost> findByType(EnergyType type);
+
+    void deleteByLastUpdatedBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

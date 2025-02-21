@@ -2,11 +2,9 @@ package com.ilo.energyallocation.user.controller;
 
 import com.ilo.energyallocation.common.exception.dto.ErrorResponse;
 import com.ilo.energyallocation.common.ratelimit.RateLimit;
-import com.ilo.energyallocation.user.dto.ForgotPasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.LoginRequestDTO;
 import com.ilo.energyallocation.user.dto.LogoutRequestDTO;
 import com.ilo.energyallocation.user.dto.RefreshTokenRequestDTO;
-import com.ilo.energyallocation.user.dto.ResetPasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.TokenResponseDTO;
 import com.ilo.energyallocation.user.service.interfaces.IAuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/api/auth")
+@RequestMapping("/api/v1/auth")
 @Tag(
         name = "Authentication", description =
-        "Authentication management APIs for user login, token refresh, password " + "reset"
+        "Authentication management APIs for user login, logout token refresh"
 )
 @RequiredArgsConstructor
 public class AuthController {
@@ -156,84 +154,5 @@ public class AuthController {
     ) {
         final TokenResponseDTO token = authenticationService.refreshToken(refreshTokenRequest.getRefreshToken());
         return ResponseEntity.ok(token);
-    }
-
-    @Operation(
-            summary = "Forgot password", description =
-            "Initiates password reset process by sending reset token " + "to" + " user's email"
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200", description = "Password reset initiated", content =
-                    @Content(mediaType = "application/json")
-                    ), @ApiResponse(
-                    responseCode = "404", description = "Email not found",
-                    content = @Content(
-                            mediaType = "application/json", schema = @Schema(
-                            implementation =
-                                    ErrorResponse.class
-                    )
-                    )
-            ), @ApiResponse(
-                    responseCode = "429", description =
-                    "Too many requests", content = @Content(
-                    mediaType = "application/json", schema = @Schema(
-                    implementation =
-                            ErrorResponse.class
-            )
-            )
-            )
-            }
-    )
-    @PostMapping("/forgot-password")
-    @RateLimit
-    public ResponseEntity<?> forgotPassword(
-            @Parameter(
-                    description = "Forgot password request containing email",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = ForgotPasswordRequestDTO.class))
-            ) @Valid @RequestBody final ForgotPasswordRequestDTO forgotPasswordRequest
-    ) {
-        authenticationService.initiatePasswordReset(forgotPasswordRequest.getEmail());
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "Reset password", description = "Resets user password using the provided reset token")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200", description = "Password successfully reset", content =
-                    @Content(mediaType = "application/json")
-                    ), @ApiResponse(
-                    responseCode = "400", description =
-                    "Invalid or expired " + "token", content = @Content(
-                    mediaType = "application/json", schema =
-            @Schema(implementation = ErrorResponse.class)
-            )
-            ), @ApiResponse(
-                    responseCode = "429",
-                    description = "Too many" + " requests", content = @Content(
-                    mediaType = "application/json", schema =
-            @Schema(implementation = ErrorResponse.class)
-            )
-            )
-            }
-    )
-    @PostMapping("/reset-password")
-    @RateLimit
-    public ResponseEntity<?> resetPassword(
-            @Parameter(
-                    description = "Reset password request containing token and new "
-                            + "password", required = true, content = @Content(
-                    schema = @Schema(
-                            implementation =
-                                    ResetPasswordRequestDTO.class
-                    )
-            )
-            ) @Valid @RequestBody final ResetPasswordRequestDTO resetPasswordRequest
-    ) {
-        authenticationService.resetPassword(resetPasswordRequest.getToken(), resetPasswordRequest.getNewPassword());
-        return ResponseEntity.ok().build();
     }
 }

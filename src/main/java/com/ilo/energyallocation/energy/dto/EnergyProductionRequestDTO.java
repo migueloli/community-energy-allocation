@@ -1,7 +1,8 @@
 package com.ilo.energyallocation.energy.dto;
 
+import com.ilo.energyallocation.energy.model.EnergyType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
@@ -18,9 +19,11 @@ import java.time.LocalDateTime;
 @Schema(description = "Energy production request details")
 public class EnergyProductionRequestDTO {
     @NotNull
-    @Valid
-    @Schema(description = "Details of energy produced from different sources")
-    private EnergyProducedDTO producedEnergy;
+    private EnergyType energyType;
+
+    @NotNull
+    @Min(0)
+    private Double production;
 
     @Schema(description = "Timestamp of energy production", example = "2024-02-20T15:30:00Z")
     @NotNull(message = "Timestamp is required")

@@ -1,11 +1,12 @@
 package com.ilo.energyallocation.user.service.interfaces;
 
-import com.ilo.energyallocation.user.dto.ChangePasswordRequestDTO;
 import com.ilo.energyallocation.user.dto.UserRegistrationRequestDTO;
 import com.ilo.energyallocation.user.dto.UserResponseDTO;
 import com.ilo.energyallocation.user.dto.UserUpdateRequestDTO;
 import com.ilo.energyallocation.user.model.IloUser;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
+import java.util.List;
 
 public interface IUserService extends UserDetailsService {
     UserResponseDTO findByUsernameOrEmail(String username);
@@ -16,7 +17,7 @@ public interface IUserService extends UserDetailsService {
 
     UserResponseDTO updateUser(String userId, UserUpdateRequestDTO updateDTO);
 
-    void changePassword(String userId, ChangePasswordRequestDTO changePasswordDTO);
-
     UserResponseDTO findById(String userId);
+
+    List<UserResponseDTO> findAllUsers();
 }

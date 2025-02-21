@@ -14,6 +14,8 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
         vendor = JvmVendorSpec.AMAZON
     }
+    withSourcesJar()
+    withJavadocJar()
 }
 
 repositories {
@@ -50,6 +52,9 @@ dependencies {
     // Bucket4j
     implementation(libs.bundles.bucket4j)
 
+    // Mongock
+    implementation(libs.bundles.mongock)
+
     // Swagger UI
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
 
@@ -58,6 +63,10 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.mockito.core)
     mockitoAgent(libs.mockito.core) { isTransitive = false }
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
 }
 
 tasks.withType<Test> {

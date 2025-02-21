@@ -1,6 +1,5 @@
 package com.ilo.energyallocation.energy.strategy.factory;
 
-import com.ilo.energyallocation.energy.strategy.CommunityEnergyStrategy;
 import com.ilo.energyallocation.energy.strategy.GridEnergyStrategy;
 import com.ilo.energyallocation.energy.strategy.PreferenceConsumptionStrategy;
 import com.ilo.energyallocation.energy.strategy.SelfProducedEnergyStrategy;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 public class EnergyConsumptionStrategyFactory {
     private final PreferenceConsumptionStrategy preferenceStrategy;
     private final SelfProducedEnergyStrategy selfProducedStrategy;
-    private final CommunityEnergyStrategy communityStrategy;
     private final List<DynamicEnergyConsumptionStrategy> renewableStrategies;
     private final GridEnergyStrategy gridStrategy;
 
@@ -27,7 +25,6 @@ public class EnergyConsumptionStrategyFactory {
         List<EnergyConsumptionStrategy> strategies = new ArrayList<>();
         strategies.add(preferenceStrategy);
         strategies.add(selfProducedStrategy);
-        strategies.add(communityStrategy);
 
         // Add renewable strategies sorted by current cost
         List<EnergyConsumptionStrategy> sortedRenewableStrategies =

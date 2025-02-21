@@ -9,8 +9,4 @@ public interface IAuthenticationService {
     TokenResponseDTO refreshToken(String refreshToken);
 
     void logout(String refreshToken);
-
-    void initiatePasswordReset(String email);
-
-    void resetPassword(String token, String newPassword);
 }
