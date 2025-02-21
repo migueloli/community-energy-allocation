@@ -46,9 +46,9 @@ public class EnergyConsumptionHistoryService implements IEnergyConsumptionHistor
         EnergyConsumptionHistory log = EnergyConsumptionHistory.builder()
                 .userId(userId)
                 .amount(requestedAmount)
+                .sourcesUsed(result.getSourcesUsed())
+                .totalCost(result.getTotalCost())
                 .timestamp(timestamp)
-                .localEnergyAllocated(result.getEnergyConsumed())
-                .gridEnergyAllocated(calculateGridEnergy(result.getSourcesUsed()))
                 .build();
 
         energyConsumptionHistoryRepository.save(log);

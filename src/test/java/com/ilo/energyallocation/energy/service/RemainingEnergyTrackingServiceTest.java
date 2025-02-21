@@ -33,22 +33,22 @@ class RemainingEnergyTrackingServiceTest {
     @Test
     void getRemainingEnergy_ShouldReturnCurrentTimeSlotEnergy() {
         // Given
-        LocalDateTime timeSlot = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
-        RemainingEnergy solarEnergy = createTestRemainingEnergy(EnergyType.SOLAR, 100.0);
-        RemainingEnergy windEnergy = createTestRemainingEnergy(EnergyType.WIND, 150.0);
+        LocalDateTime timeSlot = LocalDateTime.now();
+        RemainingEnergy solarEnergy = RemainingEnergy.builder()
+                .timeSlot(timeSlot)
+                .type(EnergyType.SOLAR)
+                .remainingProduction(100.0)
+                .build();
 
-        when(remainingEnergyRepository.findByTimeSlotAndType(any(), eq(EnergyType.SOLAR)))
+        when(remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, EnergyType.SOLAR))
                 .thenReturn(Optional.of(solarEnergy));
-        when(remainingEnergyRepository.findByTimeSlotAndType(any(), eq(EnergyType.WIND)))
-                .thenReturn(Optional.of(windEnergy));
 
         // When
-        Map<EnergyType, Double> result = trackingService.getRemainingEnergy();
+        double result = trackingService.getRemainingProduction(timeSlot, EnergyType.SOLAR);
 
         // Then
-        assertThat(result).containsEntry(EnergyType.SOLAR, 100.0);
-        assertThat(result).containsEntry(EnergyType.WIND, 150.0);
+        assertThat(result).isEqualTo(100.0);
+        verify(remainingEnergyRepository).findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, EnergyType.SOLAR);
     }
 
     @Test
@@ -71,7 +71,7 @@ class RemainingEnergyTrackingServiceTest {
         // Given
         EnergyType type = EnergyType.SOLAR;
         double amount = 100.0;
-        when(remainingEnergyRepository.findByTimeSlotAndType(any(), eq(type)))
+        when(remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(any(), eq(type)))
                 .thenReturn(Optional.empty());
 
         // When
@@ -84,7 +84,7 @@ class RemainingEnergyTrackingServiceTest {
     @Test
     void getRemainingEnergy_WhenNoDataExists_ShouldReturnZeros() {
         // Given
-        when(remainingEnergyRepository.findByTimeSlotAndType(any(), any()))
+        when(remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(any(), any()))
                 .thenReturn(Optional.empty());
 
         // When

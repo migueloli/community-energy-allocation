@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,5 +18,6 @@ public class ConsumptionSummaryDTO {
     private LocalDateTime startTime;
     private LocalDateTime stopTime;
     private double totalDemand;
-    private List<EnergySource> allocation;
+    @Builder.Default
+    private List<EnergySource> allocation = new ArrayList<>();
 }

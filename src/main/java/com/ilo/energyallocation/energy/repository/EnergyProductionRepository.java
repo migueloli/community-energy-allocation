@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EnergyProductionRepository extends MongoRepository<EnergyProduction, String> {
@@ -19,7 +20,7 @@ public interface EnergyProductionRepository extends MongoRepository<EnergyProduc
                     "{ $group: { _id: null, total: { $sum: '$amount' } } }"
             }
     )
-    double sumProductionByTimestamp(LocalDateTime timestamp);
+    Optional<Double> sumProductionByTimestamp(LocalDateTime timestamp);
 
     @Aggregation(
             pipeline = {
@@ -27,7 +28,7 @@ public interface EnergyProductionRepository extends MongoRepository<EnergyProduc
                     "{ $group: { _id: null, total: { $sum: '$amount' } } }"
             }
     )
-    double sumProductionByTypeAndTimestamp(EnergyType type, LocalDateTime timestamp);
+    Optional<Double> sumProductionByTypeAndTimestamp(EnergyType type, LocalDateTime timestamp);
 
     void deleteByTimestampBetween(LocalDateTime startDate, LocalDateTime endDate);
 

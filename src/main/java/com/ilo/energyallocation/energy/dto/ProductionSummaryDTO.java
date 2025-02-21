@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class ProductionSummaryDTO {
-    private List<EnergySource> production;
+    @Builder.Default
+    private List<EnergySource> production = new ArrayList<>();
     private double surplus;
 }

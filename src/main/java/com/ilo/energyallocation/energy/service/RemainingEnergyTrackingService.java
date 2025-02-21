@@ -32,7 +32,7 @@ public class RemainingEnergyTrackingService implements IRemainingEnergyTrackingS
     }
 
     public void updateRemainingEnergy(LocalDateTime timeSlot, EnergyType type, double allocatedAmount) {
-        remainingEnergyRepository.findByTimeSlotAndType(timeSlot, type).ifPresent(energy -> {
+        remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, type).ifPresent(energy -> {
             energy.setRemainingProduction(energy.getRemainingProduction() - allocatedAmount);
             energy.setRemainingDemand(energy.getRemainingDemand() - allocatedAmount);
             remainingEnergyRepository.save(energy);
@@ -40,13 +40,13 @@ public class RemainingEnergyTrackingService implements IRemainingEnergyTrackingS
     }
 
     public double getRemainingProduction(LocalDateTime timeSlot, EnergyType type) {
-        return remainingEnergyRepository.findByTimeSlotAndType(timeSlot, type)
+        return remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, type)
                 .map(RemainingEnergy::getRemainingProduction)
                 .orElse(0.0);
     }
 
     public double getRemainingDemand(LocalDateTime timeSlot, EnergyType type) {
-        return remainingEnergyRepository.findByTimeSlotAndType(timeSlot, type)
+        return remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, type)
                 .map(RemainingEnergy::getRemainingDemand)
                 .orElse(0.0);
     }
@@ -68,11 +68,12 @@ public class RemainingEnergyTrackingService implements IRemainingEnergyTrackingS
         LocalDateTime currentTimeSlot = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
                 .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
 
-        remainingEnergyRepository.findByTimeSlotAndType(currentTimeSlot, type).ifPresent(energy -> {
-            energy.setRemainingProduction(energy.getRemainingProduction() - amount);
-            energy.setRemainingDemand(energy.getRemainingDemand() + amount);
-            remainingEnergyRepository.save(energy);
-        });
+        remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(currentTimeSlot, type).ifPresent(
+                energy -> {
+                    energy.setRemainingProduction(energy.getRemainingProduction() - amount);
+                    energy.setRemainingDemand(energy.getRemainingDemand() + amount);
+                    remainingEnergyRepository.save(energy);
+                });
     }
 }
 

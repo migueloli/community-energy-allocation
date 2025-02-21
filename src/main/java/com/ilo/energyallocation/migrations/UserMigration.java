@@ -25,9 +25,7 @@ public class UserMigration {
                 createUser("alice", "alice@email.com", "password1", List.of(Role.USER), EnergyPreference.SOLAR),
                 createUser("bob", "bob@email.com", "password2", List.of(Role.USER), EnergyPreference.WIND),
                 createUser("charlie", "charlie@email.com", "password3", List.of(Role.USER), EnergyPreference.HYDRO),
-                createUser("dave", "dave@email.com", "password4", List.of(Role.USER), EnergyPreference.BIOMASS),
-                createUser("emma", "emma@email.com", "password5", List.of(Role.USER), EnergyPreference.SOLAR),
-                createUser("frank", "frank@email.com", "password6", List.of(Role.USER), EnergyPreference.WIND),
+                createUser("dave", "dave@email.com", "password4", List.of(Role.USER), EnergyPreference.NO_PREFERENCE),
                 createUser(
                         "admin", "admin@email.com", "adminpass", List.of(Role.USER, Role.ADMIN),
                         EnergyPreference.NO_PREFERENCE

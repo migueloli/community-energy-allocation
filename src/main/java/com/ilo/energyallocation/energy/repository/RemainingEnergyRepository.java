@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface RemainingEnergyRepository extends MongoRepository<RemainingEnergy, String> {
-    Optional<RemainingEnergy> findByTimeSlotAndType(LocalDateTime timeSlot, EnergyType type);
+    Optional<RemainingEnergy> findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(LocalDateTime timeSlot, EnergyType type);
 }

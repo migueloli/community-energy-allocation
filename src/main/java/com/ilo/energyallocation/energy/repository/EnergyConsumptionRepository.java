@@ -1,6 +1,5 @@
 package com.ilo.energyallocation.energy.repository;
 
-import com.ilo.energyallocation.energy.model.EnergyConsumption;
 import com.ilo.energyallocation.energy.model.EnergyConsumptionHistory;
 import com.ilo.energyallocation.energy.model.EnergyType;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EnergyConsumptionRepository extends MongoRepository<EnergyConsumptionHistory, String> {
@@ -17,7 +17,7 @@ public interface EnergyConsumptionRepository extends MongoRepository<EnergyConsu
     List<EnergyConsumptionHistory> findByUserIdAndTimestampBetween(
             String userId, LocalDateTime startDate, LocalDateTime endDate);
 
-    List<EnergyConsumption> findByTimestamp(LocalDateTime timestamp);
+    List<EnergyConsumptionHistory> findByTimestamp(LocalDateTime timestamp);
 
     @Aggregation(
             pipeline = {
@@ -25,7 +25,7 @@ public interface EnergyConsumptionRepository extends MongoRepository<EnergyConsu
                     "{ $group: { _id: null, total: { $sum: '$amount' } } }"
             }
     )
-    double sumConsumptionByTimestamp(LocalDateTime timestamp);
+    Optional<Double> sumConsumptionByTimestamp(LocalDateTime timestamp);
 
     @Aggregation(
             pipeline = {
@@ -33,7 +33,7 @@ public interface EnergyConsumptionRepository extends MongoRepository<EnergyConsu
                     "{ $group: { _id: null, total: { $sum: '$amount' } } }"
             }
     )
-    double sumConsumptionByTypeAndTimestamp(EnergyType type, LocalDateTime timestamp);
+    Optional<Double> sumConsumptionByTypeAndTimestamp(EnergyType type, LocalDateTime timestamp);
 
     void deleteByTimestampBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

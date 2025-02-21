@@ -55,14 +55,14 @@ public class PreferenceConsumptionStrategy implements EnergyConsumptionStrategy 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime timeStep = now.truncatedTo(ChronoUnit.MINUTES)
                 .withMinute((now.getMinute() / 15) * 15);
-        return productionRepository.sumProductionByTypeAndTimestamp(type, timeStep);
+        return productionRepository.sumProductionByTypeAndTimestamp(type, timeStep).orElse(0.0);
     }
 
     private double getTotalDemand(EnergyType type) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime timeStep = now.truncatedTo(ChronoUnit.MINUTES)
                 .withMinute((now.getMinute() / 15) * 15);
-        return consumptionRepository.sumConsumptionByTypeAndTimestamp(type, timeStep);
+        return consumptionRepository.sumConsumptionByTypeAndTimestamp(type, timeStep).orElse(0.0);
     }
 
 

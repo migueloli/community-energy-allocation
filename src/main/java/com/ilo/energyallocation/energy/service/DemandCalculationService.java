@@ -1,9 +1,9 @@
 package com.ilo.energyallocation.energy.service;
 
 import com.ilo.energyallocation.energy.model.CommunityEnergyMetrics;
-import com.ilo.energyallocation.energy.model.EnergyConsumption;
 import com.ilo.energyallocation.energy.model.EnergyConsumptionHistory;
 import com.ilo.energyallocation.energy.model.EnergyCost;
+import com.ilo.energyallocation.energy.model.EnergySource;
 import com.ilo.energyallocation.energy.model.EnergyType;
 import com.ilo.energyallocation.energy.repository.CommunityEnergyMetricsRepository;
 import com.ilo.energyallocation.energy.repository.EnergyConsumptionRepository;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,158 +31,125 @@ public class DemandCalculationService implements IDemandCalculationService {
     private final CommunityEnergyMetricsRepository metricsRepository;
     private final EnergyCostRepository energyCostRepository;
 
-    @Scheduled(fixedRate = 900000) // 15 minutes in milliseconds
+    @Scheduled(fixedRate = 900000) // 15 minutes
     @Override
     public void calculateDemandAllocation() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime timeStep = now.truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((now.getMinute() / 15) * 15);
+        LocalDateTime timeStep = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
 
-        // Update energy costs first
         updateEnergyCosts(timeStep);
 
-        // Existing demand calculation logic
         double totalProduction = calculateTotalProduction(timeStep);
         double totalDemand = calculateTotalDemand(timeStep);
 
-
-        // Step 2: Calculate local energy allocation
-        Map<String, Double> localEnergyAllocations = calculateLocalEnergyAllocations(
+        Map<String, List<EnergySource>> energyAllocations = calculateEnergyAllocations(
                 totalProduction, totalDemand, timeStep);
+        CommunityEnergyMetrics metrics = calculateCommunityMetrics(totalProduction, totalDemand, timeStep);
 
-        // Step 3: Calculate grid energy allocations
-        Map<String, Double> gridEnergyAllocations = calculateGridEnergyAllocations(
-                totalProduction, totalDemand, timeStep);
-
-        // Step 4: Calculate community metrics
-        CommunityEnergyMetrics metrics = calculateGridMetrics(
-                totalProduction, totalDemand, localEnergyAllocations, timeStep);
-
-        // Store the results
-        saveResults(localEnergyAllocations, gridEnergyAllocations, metrics, timeStep);
+        saveResults(energyAllocations, metrics, timeStep);
     }
 
     @Override
     public void updateEnergyCosts(LocalDateTime timeStep) {
-        Arrays.stream(EnergyType.values()).forEach(type -> {
-            EnergyCost cost = energyCostRepository.findByType(type)
-                    .orElse(EnergyCost.builder().type(type).build());
-
-            // Calculate new cost based on supply and demand
-            double newCost = calculateNewCost(type, timeStep);
-
-            cost.setCost(newCost);
-            cost.setLastUpdated(timeStep);
-            energyCostRepository.save(cost);
-        });
+        Arrays.stream(EnergyType.values())
+                .forEach(type -> {
+                    double newCost = calculateNewCost(type, timeStep);
+                    EnergyCost cost = energyCostRepository.findByType(type)
+                            .orElse(EnergyCost.builder().type(type).build());
+                    cost.setCost(newCost);
+                    cost.setLastUpdated(timeStep);
+                    energyCostRepository.save(cost);
+                });
     }
 
     @Override
     public double calculateNewCost(EnergyType type, LocalDateTime timeStep) {
-        double production = productionRepository.sumProductionByTypeAndTimestamp(type, timeStep);
-        double demand = consumptionRepository.sumConsumptionByTypeAndTimestamp(type, timeStep);
+        double production = productionRepository.sumProductionByTypeAndTimestamp(type, timeStep).orElse(0.0);
+        double demand = consumptionRepository.sumConsumptionByTypeAndTimestamp(type, timeStep).orElse(0.0);
 
-        // Basic cost calculation based on supply and demand ratio
-        // This can be enhanced with more sophisticated pricing models
         if (demand <= 0) return type.getBasePrice();
-        return type.getBasePrice() * (demand / Math.max(production, 1));
-    }
 
-    private Map<String, Double> calculateGridEnergyAllocations(
-            double totalProduction, double totalDemand, LocalDateTime timeStep) {
-        Map<String, Double> gridAllocations = new HashMap<>();
-        List<EnergyConsumption> consumptions = consumptionRepository.findByTimestamp(timeStep);
-
-        if (totalProduction < totalDemand) {
-            consumptions.forEach(consumption -> {
-                double gridEnergy = consumption.getAmount() -
-                        (consumption.getAmount() * totalProduction / totalDemand);
-                gridAllocations.put(consumption.getUserId(), gridEnergy);
-            });
-        } else {
-            consumptions.forEach(consumption ->
-                    gridAllocations.put(consumption.getUserId(), 0.0));
-        }
-
-        return gridAllocations;
+        double demandFactor = demand / Math.max(production, 1);
+        return type.getBasePrice() * Math.min(demandFactor, 2.0); // Cap at 2x base price
     }
 
     private void saveResults(
-            Map<String, Double> localEnergyAllocations,
-            Map<String, Double> gridEnergyAllocations,
+            Map<String, List<EnergySource>> energyAllocations,
             CommunityEnergyMetrics metrics,
             LocalDateTime timeStep
     ) {
-        // Save individual allocations
-        List<EnergyConsumption> consumptions = consumptionRepository.findByTimestamp(timeStep);
+        List<EnergyConsumptionHistory> consumptions = consumptionRepository.findByTimestamp(timeStep);
         consumptions.forEach(consumption -> {
-            EnergyConsumptionHistory history = new EnergyConsumptionHistory();
-            history.setUserId(consumption.getUserId());
-            history.setTimestamp(timeStep);
-            history.setAmount(consumption.getAmount());
-            history.setLocalEnergyAllocated(
-                    localEnergyAllocations.getOrDefault(consumption.getUserId(), 0.0));
-            history.setGridEnergyAllocated(
-                    gridEnergyAllocations.getOrDefault(consumption.getUserId(), 0.0));
-            consumptionRepository.save(history);
+            List<EnergySource> sources = energyAllocations.get(consumption.getUserId());
+            consumption.setSourcesUsed(sources);
+            consumption.setTotalCost(calculateTotalCost(sources));
+            consumptionRepository.save(consumption);
         });
 
-        // Save community metrics
         metricsRepository.save(metrics);
     }
 
-    private double calculateTotalProduction(LocalDateTime timeStep) {
-        return productionRepository.sumProductionByTimestamp(timeStep);
-    }
-
-    private double calculateTotalDemand(LocalDateTime timeStep) {
-        return consumptionRepository.sumConsumptionByTimestamp(timeStep);
-    }
-
-    private Map<String, Double> calculateLocalEnergyAllocations(
+    private Map<String, List<EnergySource>> calculateEnergyAllocations(
             double totalProduction, double totalDemand, LocalDateTime timeStep) {
+        Map<String, List<EnergySource>> allocations = new HashMap<>();
+        List<EnergyConsumptionHistory> consumptions = consumptionRepository.findByTimestamp(timeStep);
 
-        Map<String, Double> allocations = new HashMap<>();
-        List<EnergyConsumption> consumptions = consumptionRepository.findByTimestamp(timeStep);
+        double allocationRatio = totalProduction >= totalDemand ? 1.0 : totalProduction / totalDemand;
 
-        if (totalProduction < totalDemand) {
-            double ratio = totalProduction / totalDemand;
-            consumptions.forEach(consumption -> {
-                double allocation = consumption.getAmount() * ratio;
-                allocations.put(consumption.getUserId(), allocation);
-            });
-        } else {
-            consumptions.forEach(consumption -> {
-                allocations.put(consumption.getUserId(), consumption.getAmount());
-            });
-        }
+        consumptions.forEach(consumption -> {
+            List<EnergySource> sources = calculateEnergySourcesForConsumption(
+                    consumption.getAmount(), allocationRatio);
+            allocations.put(consumption.getUserId(), sources);
+        });
 
         return allocations;
     }
 
-    private CommunityEnergyMetrics calculateGridMetrics(
-            double totalProduction, double totalDemand,
-            Map<String, Double> localAllocations, LocalDateTime timeStep
-    ) {
+    private List<EnergySource> calculateEnergySourcesForConsumption(double amount, double allocationRatio) {
+        List<EnergySource> sources = new ArrayList<>();
+        double localEnergy = amount * allocationRatio;
+        double gridEnergy = amount - localEnergy;
 
-        CommunityEnergyMetrics metrics = new CommunityEnergyMetrics();
-        metrics.setTimestamp(timeStep);
-        metrics.setTotalProduction(totalProduction);
-        metrics.setTotalDemand(totalDemand);
-
-        if (totalProduction < totalDemand) {
-            double totalGridEnergy = totalDemand - totalProduction;
-            metrics.setTotalGridEnergy(totalGridEnergy);
-            metrics.setTotalSurplus(0.0);
-        } else if (totalProduction > totalDemand) {
-            metrics.setTotalGridEnergy(0.0);
-            metrics.setTotalSurplus(totalProduction - totalDemand);
-        } else {
-            metrics.setTotalGridEnergy(0.0);
-            metrics.setTotalSurplus(0.0);
+        if (localEnergy > 0) {
+            sources.add(new EnergySource(EnergyType.SOLAR, localEnergy * 0.4));
+            sources.add(new EnergySource(EnergyType.WIND, localEnergy * 0.3));
+            sources.add(new EnergySource(EnergyType.HYDRO, localEnergy * 0.2));
+            sources.add(new EnergySource(EnergyType.BIOMASS, localEnergy * 0.1));
         }
 
-        return metrics;
+        if (gridEnergy > 0) {
+            sources.add(new EnergySource(EnergyType.GRID, gridEnergy));
+        }
+
+        return sources;
     }
 
+
+    private double calculateTotalCost(List<EnergySource> sources) {
+        return sources.stream()
+                .mapToDouble(source -> source.getAmount() *
+                        energyCostRepository.findByType(source.getSource())
+                                .map(EnergyCost::getCost)
+                                .orElse(source.getSource().getBasePrice()))
+                .sum();
+    }
+
+    private CommunityEnergyMetrics calculateCommunityMetrics(
+            double totalProduction, double totalDemand, LocalDateTime timeStep) {
+        return CommunityEnergyMetrics.builder()
+                .timestamp(timeStep)
+                .totalProduction(totalProduction)
+                .totalDemand(totalDemand)
+                .totalGridEnergy(Math.max(0, totalDemand - totalProduction))
+                .totalSurplus(Math.max(0, totalProduction - totalDemand))
+                .build();
+    }
+
+    private double calculateTotalProduction(LocalDateTime timeStep) {
+        return productionRepository.sumProductionByTimestamp(timeStep).orElse(0.0);
+    }
+
+    private double calculateTotalDemand(LocalDateTime timeStep) {
+        return consumptionRepository.sumConsumptionByTimestamp(timeStep).orElse(0.0);
+    }
 }

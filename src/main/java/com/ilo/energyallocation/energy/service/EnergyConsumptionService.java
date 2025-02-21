@@ -107,7 +107,8 @@ public class EnergyConsumptionService implements IEnergyConsumptionService {
         Map<EnergyType, Double> initialDemand = new EnumMap<>(EnergyType.class);
 
         Arrays.stream(EnergyType.values()).forEach(type -> {
-            initialProduction.put(type, productionRepository.sumProductionByTypeAndTimestamp(type, timeSlot));
+            initialProduction.put(
+                    type, productionRepository.sumProductionByTypeAndTimestamp(type, timeSlot).orElse(0.0));
             initialDemand.put(type, 0.0);
         });
 

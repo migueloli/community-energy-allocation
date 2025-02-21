@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Data
@@ -21,6 +23,7 @@ public class EnergyConsumptionHistory {
     private String userId;
     private double amount;
     private LocalDateTime timestamp;
-    private double localEnergyAllocated;
-    private double gridEnergyAllocated;
+    @Builder.Default
+    private List<EnergySource> sourcesUsed = new ArrayList<>();
+    private double totalCost;
 }

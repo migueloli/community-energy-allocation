@@ -21,10 +21,12 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 @ChangeUnit(id = "energyDataMigration001", order = "002", author = "miguel", systemVersion = "1")
 public class EnergyDataMigration {
+    static final int weekCount = 5;  // Number of weeks to create data for
     private final UserRepository userRepository;
     private final IEnergyProductionService productionService;
     private final IEnergyConsumptionService consumptionService;
@@ -34,47 +36,43 @@ public class EnergyDataMigration {
     @Execution
     public void addInitialEnergyData() {
         createAndSaveEnergyCosts();
-        createInitialProductionAndConsumption();
-    }
-
-    private void createInitialProductionAndConsumption() {
         List<IloUser> users = userRepository.findAll();
-        LocalDateTime baseTime = LocalDateTime.now().minusWeeks(8);
+        LocalDateTime baseTime = LocalDateTime.now().minusWeeks(weekCount);
 
         users.forEach(user -> {
-            // Create production data for 8 weeks
-            for (int week = 0; week < 8; week++) {
-                for (int day = 0; day < 7; day++) {
-                    for (int hour = 0; hour < 24; hour += 3) {
-                        LocalDateTime timestamp = baseTime.plusWeeks(week).plusDays(day).plusHours(hour);
-                        createDiversifiedProduction(user.getId(), timestamp);
-                    }
-                }
-            }
+            // Create production data for each user
+            IntStream.range(0, weekCount * 7).forEach(day -> {
+                IntStream.range(0, 24).filter(hour -> hour % 4 == 0).forEach(hour -> {
+                    LocalDateTime timestamp = baseTime.plusDays(day).plusHours(hour);
+                    createDiversifiedProduction(user.getId(), timestamp);
+                });
+            });
 
-            // Create consumption data for 8 weeks
-            Random random = new Random();
-            for (int week = 0; week < 8; week++) {
-                for (int day = 0; day < 7; day++) {
-                    for (int hour = 0; hour < 24; hour++) {
-                        LocalDateTime timestamp = baseTime.plusWeeks(week).plusDays(day).plusHours(hour);
-                        double consumption = generateConsumptionAmount(hour, day, random);
-                        createAndSaveConsumption(user, consumption, timestamp);
-                    }
-                }
-            }
+            // Create consumption data for each user
+            IntStream.range(0, weekCount * 7).forEach(day -> {
+                IntStream.range(0, 24).filter(hour -> hour % 2 == 0).forEach(hour -> {
+                    LocalDateTime timestamp = baseTime.plusDays(day).plusHours(hour);
+                    double consumption = generateConsumptionAmount(hour, day % 7);
+                    createAndSaveConsumption(user, consumption, timestamp);
+                });
+            });
         });
     }
 
-    private double generateConsumptionAmount(int hour, int day, Random random) {
-        // Peak hours: 7-9 AM and 6-8 PM on weekdays
+    private double generateConsumptionAmount(int hour, int dayOfWeek) {
+        Random random = new Random();
         boolean isPeakHour = (hour >= 7 && hour <= 9) || (hour >= 18 && hour <= 20);
-        boolean isWeekday = day < 5;
+        boolean isWeekday = dayOfWeek < 5;
+
+        double baseAmount = 10.0;
+        double variation = 20.0;
 
         if (isPeakHour && isWeekday) {
-            return 30 + random.nextDouble() * 40; // Higher consumption during peak hours
+            baseAmount = 30.0;
+            variation = 40.0;
         }
-        return 10 + random.nextDouble() * 20; // Base consumption
+
+        return baseAmount + random.nextDouble() * variation;
     }
 
     private void createDiversifiedProduction(String userId, LocalDateTime timestamp) {
@@ -82,24 +80,25 @@ public class EnergyDataMigration {
                 .filter(type -> type != EnergyType.GRID)
                 .forEach(type -> {
                     double amount = generateRealisticAmount(type, timestamp.getHour());
-                    createAndSaveProduction(userId, type, amount, timestamp);
+                    if (amount > 0) {
+                        createAndSaveProduction(userId, type, amount, timestamp);
+                    }
                 });
     }
 
     private double generateRealisticAmount(EnergyType type, int hour) {
         Random random = new Random();
-        double baseAmount = switch (type) {
+        return switch (type) {
             case SOLAR -> (hour >= 6 && hour <= 18) ? 50 + random.nextDouble() * 50 : 5;
             case WIND -> 30 + random.nextDouble() * 40;
             case HYDRO -> 40 + random.nextDouble() * 30;
             case BIOMASS -> 20 + random.nextDouble() * 30;
             default -> 0;
         };
-        return Math.max(0, baseAmount);
     }
 
     private void createAndSaveProduction(String userId, EnergyType type, double amount, LocalDateTime timestamp) {
-        final EnergyProductionRequestDTO request = EnergyProductionRequestDTO.builder()
+        EnergyProductionRequestDTO request = EnergyProductionRequestDTO.builder()
                 .energyType(type)
                 .production(amount)
                 .timestamp(timestamp)
@@ -108,7 +107,7 @@ public class EnergyDataMigration {
     }
 
     private void createAndSaveConsumption(IloUser user, double amount, LocalDateTime timestamp) {
-        final EnergyConsumptionRequestDTO request = EnergyConsumptionRequestDTO.builder()
+        EnergyConsumptionRequestDTO request = EnergyConsumptionRequestDTO.builder()
                 .requiredAmount(amount)
                 .timestamp(timestamp)
                 .build();

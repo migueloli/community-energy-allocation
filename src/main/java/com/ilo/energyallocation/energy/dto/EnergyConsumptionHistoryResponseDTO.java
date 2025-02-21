@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,6 +19,7 @@ public class EnergyConsumptionHistoryResponseDTO {
     private String userId;
     private double requestedEnergy;
     private String strategyUsed;
-    private List<EnergySource> sourcesUsed;
+    @Builder.Default
+    private List<EnergySource> sourcesUsed = new ArrayList<>();
     private LocalDateTime timestamp;
 }
