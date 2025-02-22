@@ -31,7 +31,8 @@ public class RemainingEnergyTrackingService implements IRemainingEnergyTrackingS
         });
     }
 
-    public void updateRemainingEnergy(LocalDateTime timeSlot, EnergyType type, double allocatedAmount) {
+    public void subtractFromRemainingEnergy(LocalDateTime timeSlot, EnergyType type, double allocatedAmount) {
+        var currentTimeSlot = processTimeSlot(timeSlot);
         remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, type).ifPresent(energy -> {
             energy.setRemainingProduction(energy.getRemainingProduction() - allocatedAmount);
             energy.setRemainingDemand(energy.getRemainingDemand() - allocatedAmount);
@@ -39,22 +40,33 @@ public class RemainingEnergyTrackingService implements IRemainingEnergyTrackingS
         });
     }
 
-    public double getRemainingProduction(LocalDateTime timeSlot, EnergyType type) {
-        return remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, type)
+    public void addToRemainingEnergy(LocalDateTime time, EnergyType type, double allocatedAmount) {
+        var currentTimeSlot = processTimeSlot(time);
+        remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(currentTimeSlot, type).ifPresent(
+                energy -> {
+                    energy.setRemainingProduction(energy.getRemainingProduction() + allocatedAmount);
+                    energy.setRemainingDemand(energy.getRemainingDemand() + allocatedAmount);
+                    remainingEnergyRepository.save(energy);
+                });
+    }
+
+    public double getRemainingProduction(LocalDateTime time, EnergyType type) {
+        var currentTimeSlot = processTimeSlot(time);
+        return remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(currentTimeSlot, type)
                 .map(RemainingEnergy::getRemainingProduction)
                 .orElse(0.0);
     }
 
-    public double getRemainingDemand(LocalDateTime timeSlot, EnergyType type) {
-        return remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, type)
+    public double getRemainingDemand(LocalDateTime time, EnergyType type) {
+        var currentTimeSlot = processTimeSlot(time);
+        return remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(currentTimeSlot, type)
                 .map(RemainingEnergy::getRemainingDemand)
                 .orElse(0.0);
     }
 
     @Override
-    public Map<EnergyType, Double> getRemainingEnergy() {
-        LocalDateTime currentTimeSlot = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
+    public Map<EnergyType, Double> getRemainingEnergy(LocalDateTime time) {
+        var currentTimeSlot = processTimeSlot(time);
 
         Map<EnergyType, Double> remainingEnergy = new EnumMap<>(EnergyType.class);
         Arrays.stream(EnergyType.values()).forEach(type ->
@@ -64,9 +76,8 @@ public class RemainingEnergyTrackingService implements IRemainingEnergyTrackingS
     }
 
     @Override
-    public void consumeEnergy(EnergyType type, double amount) {
-        LocalDateTime currentTimeSlot = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
+    public void consumeEnergy(EnergyType type, double amount, LocalDateTime time) {
+        var currentTimeSlot = processTimeSlot(time);
 
         remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(currentTimeSlot, type).ifPresent(
                 energy -> {
@@ -74,6 +85,14 @@ public class RemainingEnergyTrackingService implements IRemainingEnergyTrackingS
                     energy.setRemainingDemand(energy.getRemainingDemand() + amount);
                     remainingEnergyRepository.save(energy);
                 });
+    }
+
+    @Override
+    public LocalDateTime processTimeSlot(LocalDateTime timeSlot) {
+        return timeSlot.truncatedTo(ChronoUnit.MINUTES)
+                .withMinute((LocalDateTime.now().getMinute() / 15) * 15)
+                .withSecond(0)
+                .withNano(0);
     }
 }
 

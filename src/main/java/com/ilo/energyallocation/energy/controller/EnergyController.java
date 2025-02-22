@@ -14,6 +14,7 @@ import com.ilo.energyallocation.energy.service.interfaces.IDemandCalculationServ
 import com.ilo.energyallocation.energy.service.interfaces.IEnergyConsumptionHistoryService;
 import com.ilo.energyallocation.energy.service.interfaces.IEnergyConsumptionService;
 import com.ilo.energyallocation.energy.service.interfaces.IEnergyProductionService;
+import com.ilo.energyallocation.energy.service.interfaces.IRemainingEnergyTrackingService;
 import com.ilo.energyallocation.user.model.IloUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,7 +39,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -51,6 +51,7 @@ public class EnergyController {
     private final IEnergyConsumptionHistoryService consumptionLogService;
     private final IEnergyProductionService productionService;
     private final IDemandCalculationService demandCalculationService;
+    private final IRemainingEnergyTrackingService remainingEnergyService;
 
     // Add new endpoint for manual demand calculation trigger (admin only)
     @Operation(summary = "[Admin] Trigger demand calculation manually")
@@ -65,8 +66,7 @@ public class EnergyController {
     @Operation(summary = "Get current energy costs")
     @GetMapping("/costs")
     public EnergyCostResponseDTO getCurrentEnergyCosts() {
-        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
+        LocalDateTime now = remainingEnergyService.processTimeSlot(LocalDateTime.now());
 
         return EnergyCostResponseDTO.builder()
                 .solarCost(demandCalculationService.calculateNewCost(EnergyType.SOLAR, now))

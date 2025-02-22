@@ -11,6 +11,7 @@ import com.ilo.energyallocation.user.model.IloUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +23,14 @@ public class SelfProducedEnergyStrategy implements EnergyConsumptionStrategy {
     private final RemainingEnergyTrackingService remainingEnergyService;
 
     @Override
-    public EnergyConsumptionResponseDTO consumeEnergy(double requiredAmount, IloUser user) {
+    public EnergyConsumptionResponseDTO consumeEnergy(double requiredAmount, IloUser user, LocalDateTime timeSlot) {
         List<EnergyProduction> productions = productionRepository.findByUserIdOrderByTimestampDesc(user.getId());
 
         if (productions.isEmpty()) {
             return null;
         }
 
-        Map<EnergyType, Double> availableEnergy = remainingEnergyService.getRemainingEnergy();
+        Map<EnergyType, Double> availableEnergy = remainingEnergyService.getRemainingEnergy(timeSlot);
         double totalAvailable = availableEnergy.values().stream().mapToDouble(Double::doubleValue).sum();
 
         if (totalAvailable <= 0) {
@@ -46,7 +47,7 @@ public class SelfProducedEnergyStrategy implements EnergyConsumptionStrategy {
 
         // Update remaining energy
         sources.forEach(source ->
-                remainingEnergyService.consumeEnergy(source.getSource(), source.getAmount())
+                remainingEnergyService.consumeEnergy(source.getSource(), source.getAmount(), timeSlot)
         );
 
         return result;

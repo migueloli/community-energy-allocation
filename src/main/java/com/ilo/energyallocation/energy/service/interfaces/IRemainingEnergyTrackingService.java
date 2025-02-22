@@ -7,13 +7,15 @@ import java.util.Map;
 
 public interface IRemainingEnergyTrackingService {
     void initializeTimeSlot(
-            LocalDateTime timeSlot, Map<EnergyType, Double> initialProduction, Map<EnergyType, Double> initialDemand);
+            LocalDateTime time, Map<EnergyType, Double> initialProduction, Map<EnergyType, Double> initialDemand);
 
-    Map<EnergyType, Double> getRemainingEnergy();
+    Map<EnergyType, Double> getRemainingEnergy(LocalDateTime time);
 
-    void consumeEnergy(EnergyType type, double amount);
+    void consumeEnergy(EnergyType type, double amount, LocalDateTime time);
 
-    double getRemainingProduction(LocalDateTime timeSlot, EnergyType type);
+    double getRemainingProduction(LocalDateTime time, EnergyType type);
 
-    double getRemainingDemand(LocalDateTime timeSlot, EnergyType type);
+    double getRemainingDemand(LocalDateTime time, EnergyType type);
+
+    LocalDateTime processTimeSlot(LocalDateTime timeSlot);
 }

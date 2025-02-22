@@ -8,7 +8,8 @@ import com.ilo.energyallocation.user.model.IloUser;
 import java.time.LocalDateTime;
 
 public interface IEnergyConsumptionService {
-    EnergyConsumptionResponseDTO consumeEnergy(EnergyConsumptionRequestDTO request, IloUser user);
+    EnergyConsumptionResponseDTO consumeEnergy(
+            EnergyConsumptionRequestDTO request, IloUser user);
 
     EnergySummaryResponseDTO getEnergySummary(
             String userId,

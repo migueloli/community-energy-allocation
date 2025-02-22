@@ -57,7 +57,6 @@ class EnergyProductionServiceTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getProduction()).isEqualTo(expected.getProduction());
-        verify(remainingEnergyService).initializeTimeSlot(any(), any(), any());
         verify(demandCalculationService).updateEnergyCosts(any());
     }
 

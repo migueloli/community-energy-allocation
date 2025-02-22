@@ -9,7 +9,6 @@ import com.ilo.energyallocation.energy.dto.EnergySummaryResponseDTO;
 import com.ilo.energyallocation.energy.dto.ProductionSummaryDTO;
 import com.ilo.energyallocation.energy.model.EnergyProduction;
 import com.ilo.energyallocation.energy.model.EnergySource;
-import com.ilo.energyallocation.energy.model.EnergyType;
 import com.ilo.energyallocation.energy.repository.EnergyProductionRepository;
 import com.ilo.energyallocation.energy.service.interfaces.IDemandCalculationService;
 import com.ilo.energyallocation.energy.service.interfaces.IEnergyConsumptionHistoryService;
@@ -24,8 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.EnumMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,20 +40,19 @@ public class EnergyConsumptionService implements IEnergyConsumptionService {
     private final IDemandCalculationService demandCalculationService;
 
     @Override
-    public EnergyConsumptionResponseDTO consumeEnergy(EnergyConsumptionRequestDTO request, IloUser user) {
-        LocalDateTime timeSlot = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
+    public EnergyConsumptionResponseDTO consumeEnergy(
+            EnergyConsumptionRequestDTO request, IloUser user) {
+        LocalDateTime timeSlot = request.getTimestamp().truncatedTo(ChronoUnit.MINUTES)
+                .withMinute((request.getTimestamp().getMinute() / 15) * 15);
 
         double remainingAmount = request.getRequiredAmount();
         EnergyConsumptionResponseDTO result = null;
 
-        // Initialize remaining energy if not already done
-        initializeRemainingEnergy(timeSlot);
-
-        for (var strategy : strategyFactory.getStrategiesInPriorityOrder()) {
+        for (var strategy : strategyFactory.getStrategiesInPriorityOrder(user)) {
             if (remainingAmount <= 0) break;
 
-            var consumption = strategy.consumeEnergy(remainingAmount, user);
+            var consumption = strategy.consumeEnergy(remainingAmount, user, timeSlot);
+            log.info("Consumption strategy: {} {}", strategy.getClass().getSimpleName(), remainingAmount);
             if (consumption != null) {
                 if (result == null) {
                     result = consumption;
@@ -102,22 +99,10 @@ public class EnergyConsumptionService implements IEnergyConsumptionService {
                 .build();
     }
 
-    private void initializeRemainingEnergy(LocalDateTime timeSlot) {
-        Map<EnergyType, Double> initialProduction = new EnumMap<>(EnergyType.class);
-        Map<EnergyType, Double> initialDemand = new EnumMap<>(EnergyType.class);
-
-        Arrays.stream(EnergyType.values()).forEach(type -> {
-            initialProduction.put(
-                    type, productionRepository.sumProductionByTypeAndTimestamp(type, timeSlot).orElse(0.0));
-            initialDemand.put(type, 0.0);
-        });
-
-        remainingEnergyService.initializeTimeSlot(timeSlot, initialProduction, initialDemand);
-    }
-
     private List<EnergySource> calculateAllocation(List<EnergyConsumptionHistoryResponseDTO> history) {
         return history.stream()
-                .flatMap(record -> record.getSourcesUsed().stream())
+                .map(EnergyConsumptionHistoryResponseDTO::getSourcesUsed)
+                .flatMap(Collection::stream)
                 .collect(Collectors.collectingAndThen(
                         Collectors.groupingBy(
                                 EnergySource::getSource,

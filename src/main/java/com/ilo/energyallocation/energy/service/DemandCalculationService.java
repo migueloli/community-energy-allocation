@@ -10,17 +10,18 @@ import com.ilo.energyallocation.energy.repository.EnergyConsumptionRepository;
 import com.ilo.energyallocation.energy.repository.EnergyCostRepository;
 import com.ilo.energyallocation.energy.repository.EnergyProductionRepository;
 import com.ilo.energyallocation.energy.service.interfaces.IDemandCalculationService;
+import com.ilo.energyallocation.energy.service.interfaces.IRemainingEnergyTrackingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +31,12 @@ public class DemandCalculationService implements IDemandCalculationService {
     private final EnergyConsumptionRepository consumptionRepository;
     private final CommunityEnergyMetricsRepository metricsRepository;
     private final EnergyCostRepository energyCostRepository;
+    private final IRemainingEnergyTrackingService remainingEnergyService;
 
     @Scheduled(fixedRate = 900000) // 15 minutes
     @Override
     public void calculateDemandAllocation() {
-        LocalDateTime timeStep = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
+        LocalDateTime timeStep = remainingEnergyService.processTimeSlot(LocalDateTime.now());
 
         updateEnergyCosts(timeStep);
 
@@ -47,6 +48,21 @@ public class DemandCalculationService implements IDemandCalculationService {
         CommunityEnergyMetrics metrics = calculateCommunityMetrics(totalProduction, totalDemand, timeStep);
 
         saveResults(energyAllocations, metrics, timeStep);
+
+        // Initialize remaining energy tracking
+        Map<EnergyType, Double> initialProduction = Arrays.stream(EnergyType.values())
+                .collect(Collectors.toMap(
+                        type -> type,
+                        type -> productionRepository.sumProductionByTypeAndTimestamp(type, timeStep).orElse(0.0)
+                ));
+
+        Map<EnergyType, Double> initialDemand = Arrays.stream(EnergyType.values())
+                .collect(Collectors.toMap(
+                        type -> type,
+                        type -> consumptionRepository.sumConsumptionByTypeAndTimestamp(type, timeStep).orElse(0.0)
+                ));
+
+        remainingEnergyService.initializeTimeSlot(timeStep, initialProduction, initialDemand);
     }
 
     @Override

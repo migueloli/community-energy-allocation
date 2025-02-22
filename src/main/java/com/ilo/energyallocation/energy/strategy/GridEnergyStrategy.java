@@ -10,7 +10,6 @@ import com.ilo.energyallocation.user.model.IloUser;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Component
 public class GridEnergyStrategy extends DynamicEnergyConsumptionStrategy {
@@ -26,24 +25,18 @@ public class GridEnergyStrategy extends DynamicEnergyConsumptionStrategy {
     }
 
     @Override
-    public EnergyConsumptionResponseDTO consumeEnergy(double requiredAmount, IloUser user) {
-        LocalDateTime timeSlot = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
-
-        double remainingProduction = remainingEnergyService.getRemainingProduction(timeSlot, EnergyType.GRID);
-        double allocatedAmount = Math.min(requiredAmount, remainingProduction);
-
+    public EnergyConsumptionResponseDTO consumeEnergy(double requiredAmount, IloUser user, LocalDateTime timeSlot) {
         EnergyConsumptionResponseDTO result = new EnergyConsumptionResponseDTO();
 
         EnergySource source = new EnergySource();
         source.setSource(EnergyType.GRID);
-        source.setAmount(allocatedAmount);
+        source.setAmount(requiredAmount);
 
-        result.setEnergyConsumed(allocatedAmount);
+        result.setEnergyConsumed(requiredAmount);
         result.addEnergySource(source);
-        result.setTotalCost(allocatedAmount * getCurrentCost());
+        result.setTotalCost(requiredAmount * getCurrentCost());
 
-        remainingEnergyService.updateRemainingEnergy(timeSlot, EnergyType.GRID, allocatedAmount);
+        remainingEnergyService.subtractFromRemainingEnergy(timeSlot, EnergyType.GRID, requiredAmount);
 
         return result;
     }

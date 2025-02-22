@@ -26,7 +26,7 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 @ChangeUnit(id = "energyDataMigration001", order = "002", author = "miguel", systemVersion = "1")
 public class EnergyDataMigration {
-    static final int weekCount = 5;  // Number of weeks to create data for
+    static final int weekCount = 6;  // Number of weeks to create data for
     private final UserRepository userRepository;
     private final IEnergyProductionService productionService;
     private final IEnergyConsumptionService consumptionService;
@@ -79,14 +79,14 @@ public class EnergyDataMigration {
         Arrays.stream(EnergyType.values())
                 .filter(type -> type != EnergyType.GRID)
                 .forEach(type -> {
-                    double amount = generateRealisticAmount(type, timestamp.getHour());
+                    double amount = generateCustomAmount(type, timestamp.getHour());
                     if (amount > 0) {
                         createAndSaveProduction(userId, type, amount, timestamp);
                     }
                 });
     }
 
-    private double generateRealisticAmount(EnergyType type, int hour) {
+    private double generateCustomAmount(EnergyType type, int hour) {
         Random random = new Random();
         return switch (type) {
             case SOLAR -> (hour >= 6 && hour <= 18) ? 50 + random.nextDouble() * 50 : 5;

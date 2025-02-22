@@ -53,8 +53,8 @@ class EnergyConsumptionServiceTest {
         List<EnergyConsumptionStrategy> strategies = createTestStrategies();
         EnergyConsumptionResponseDTO expectedResponse = createTestResponse();
 
-        when(strategyFactory.getStrategiesInPriorityOrder()).thenReturn(strategies);
-        when(strategies.getFirst().consumeEnergy(anyDouble(), any())).thenReturn(expectedResponse);
+        when(strategyFactory.getStrategiesInPriorityOrder(user)).thenReturn(strategies);
+        when(strategies.getFirst().consumeEnergy(anyDouble(), any(), any())).thenReturn(expectedResponse);
 
         // When
         EnergyConsumptionResponseDTO result = consumptionService.consumeEnergy(request, user);
@@ -93,7 +93,7 @@ class EnergyConsumptionServiceTest {
         // Given
         IloUser user = createTestUser();
         EnergyConsumptionRequestDTO request = createTestRequest();
-        when(strategyFactory.getStrategiesInPriorityOrder()).thenReturn(List.of());
+        when(strategyFactory.getStrategiesInPriorityOrder(user)).thenReturn(List.of());
 
         // When/Then
         assertThrows(

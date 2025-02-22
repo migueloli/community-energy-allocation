@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
@@ -40,7 +39,8 @@ class RemainingEnergyTrackingServiceTest {
                 .remainingProduction(100.0)
                 .build();
 
-        when(remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, EnergyType.SOLAR))
+        when(remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(
+                any(), any(EnergyType.SOLAR.getClass())))
                 .thenReturn(Optional.of(solarEnergy));
 
         // When
@@ -48,14 +48,14 @@ class RemainingEnergyTrackingServiceTest {
 
         // Then
         assertThat(result).isEqualTo(100.0);
-        verify(remainingEnergyRepository).findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(timeSlot, EnergyType.SOLAR);
+        verify(remainingEnergyRepository).findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(
+                any(), any(EnergyType.SOLAR.getClass()));
     }
 
     @Test
     void initializeTimeSlot_WithEmptyMaps_ShouldInitializeWithZeros() {
         // Given
-        LocalDateTime timeSlot = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
+        LocalDateTime timeSlot = LocalDateTime.now();
         Map<EnergyType, Double> emptyProduction = new EnumMap<>(EnergyType.class);
         Map<EnergyType, Double> emptyDemand = new EnumMap<>(EnergyType.class);
 
@@ -71,11 +71,12 @@ class RemainingEnergyTrackingServiceTest {
         // Given
         EnergyType type = EnergyType.SOLAR;
         double amount = 100.0;
+        LocalDateTime timeSlot = LocalDateTime.now();
         when(remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(any(), eq(type)))
                 .thenReturn(Optional.empty());
 
         // When
-        trackingService.consumeEnergy(type, amount);
+        trackingService.consumeEnergy(type, amount, timeSlot);
 
         // Then
         verify(remainingEnergyRepository, never()).save(any());
@@ -84,11 +85,12 @@ class RemainingEnergyTrackingServiceTest {
     @Test
     void getRemainingEnergy_WhenNoDataExists_ShouldReturnZeros() {
         // Given
+        LocalDateTime timeSlot = LocalDateTime.now();
         when(remainingEnergyRepository.findFirstByTimeSlotAndTypeOrderByTimeSlotDesc(any(), any()))
                 .thenReturn(Optional.empty());
 
         // When
-        Map<EnergyType, Double> result = trackingService.getRemainingEnergy();
+        Map<EnergyType, Double> result = trackingService.getRemainingEnergy(timeSlot);
 
         // Then
         assertThat(result).containsValue(0.0);

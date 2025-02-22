@@ -1,10 +1,12 @@
 package com.ilo.energyallocation.energy.strategy.factory;
 
+import com.ilo.energyallocation.energy.mapper.EnergyPreferenceMapper;
 import com.ilo.energyallocation.energy.strategy.GridEnergyStrategy;
 import com.ilo.energyallocation.energy.strategy.PreferenceConsumptionStrategy;
 import com.ilo.energyallocation.energy.strategy.SelfProducedEnergyStrategy;
 import com.ilo.energyallocation.energy.strategy.interfaces.DynamicEnergyConsumptionStrategy;
 import com.ilo.energyallocation.energy.strategy.interfaces.EnergyConsumptionStrategy;
+import com.ilo.energyallocation.user.model.IloUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,15 +22,18 @@ public class EnergyConsumptionStrategyFactory {
     private final SelfProducedEnergyStrategy selfProducedStrategy;
     private final List<DynamicEnergyConsumptionStrategy> renewableStrategies;
     private final GridEnergyStrategy gridStrategy;
+    private final EnergyPreferenceMapper energyPreferenceMapper;
 
-    public List<EnergyConsumptionStrategy> getStrategiesInPriorityOrder() {
+    public List<EnergyConsumptionStrategy> getStrategiesInPriorityOrder(IloUser user) {
         List<EnergyConsumptionStrategy> strategies = new ArrayList<>();
         strategies.add(preferenceStrategy);
         strategies.add(selfProducedStrategy);
 
         // Add renewable strategies sorted by current cost
-        List<EnergyConsumptionStrategy> sortedRenewableStrategies =
-                renewableStrategies.stream().sorted(
+        final var preferenceEnergyType = energyPreferenceMapper.toEnergyType(user.getPreference());
+        final List<EnergyConsumptionStrategy> sortedRenewableStrategies =
+                renewableStrategies.stream().filter((strategy) -> strategy.getEnergyType() != preferenceEnergyType)
+                        .sorted(
                                 Comparator.comparingDouble(DynamicEnergyConsumptionStrategy::getCurrentCost))
                         .collect(Collectors.toList());
         strategies.addAll(sortedRenewableStrategies);

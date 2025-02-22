@@ -10,7 +10,6 @@ import com.ilo.energyallocation.user.model.IloUser;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Component
 public class SolarEnergyStrategy extends DynamicEnergyConsumptionStrategy {
@@ -30,10 +29,7 @@ public class SolarEnergyStrategy extends DynamicEnergyConsumptionStrategy {
     }
 
     @Override
-    public EnergyConsumptionResponseDTO consumeEnergy(double requiredAmount, IloUser user) {
-        LocalDateTime timeSlot = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((LocalDateTime.now().getMinute() / 15) * 15);
-
+    public EnergyConsumptionResponseDTO consumeEnergy(double requiredAmount, IloUser user, LocalDateTime timeSlot) {
         double remainingProduction = remainingEnergyService.getRemainingProduction(timeSlot, EnergyType.SOLAR);
         double allocatedAmount = Math.min(requiredAmount, remainingProduction);
 
@@ -47,7 +43,7 @@ public class SolarEnergyStrategy extends DynamicEnergyConsumptionStrategy {
         result.addEnergySource(source);
         result.setTotalCost(allocatedAmount * getCurrentCost());
 
-        remainingEnergyService.updateRemainingEnergy(timeSlot, EnergyType.SOLAR, allocatedAmount);
+        remainingEnergyService.subtractFromRemainingEnergy(timeSlot, EnergyType.SOLAR, allocatedAmount);
 
         return result;
     }
