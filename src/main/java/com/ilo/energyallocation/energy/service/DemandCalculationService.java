@@ -67,21 +67,23 @@ public class DemandCalculationService implements IDemandCalculationService {
 
     @Override
     public void updateEnergyCosts(LocalDateTime timeStep) {
+        LocalDateTime currentTimeStep = remainingEnergyService.processTimeSlot(timeStep);
         Arrays.stream(EnergyType.values())
                 .forEach(type -> {
-                    double newCost = calculateNewCost(type, timeStep);
+                    double newCost = calculateNewCost(type, currentTimeStep);
                     EnergyCost cost = energyCostRepository.findByType(type)
                             .orElse(EnergyCost.builder().type(type).build());
                     cost.setCost(newCost);
-                    cost.setLastUpdated(timeStep);
+                    cost.setLastUpdated(currentTimeStep);
                     energyCostRepository.save(cost);
                 });
     }
 
     @Override
     public double calculateNewCost(EnergyType type, LocalDateTime timeStep) {
-        double production = productionRepository.sumProductionByTypeAndTimestamp(type, timeStep).orElse(0.0);
-        double demand = consumptionRepository.sumConsumptionByTypeAndTimestamp(type, timeStep).orElse(0.0);
+        LocalDateTime currentTimeStep = remainingEnergyService.processTimeSlot(timeStep);
+        double production = productionRepository.sumProductionByTypeAndTimestamp(type, currentTimeStep).orElse(0.0);
+        double demand = consumptionRepository.sumConsumptionByTypeAndTimestamp(type, currentTimeStep).orElse(0.0);
 
         if (demand <= 0) return type.getBasePrice();
 
@@ -94,7 +96,8 @@ public class DemandCalculationService implements IDemandCalculationService {
             CommunityEnergyMetrics metrics,
             LocalDateTime timeStep
     ) {
-        List<EnergyConsumptionHistory> consumptions = consumptionRepository.findByTimestamp(timeStep);
+        var currentTimeStep = remainingEnergyService.processTimeSlot(timeStep);
+        List<EnergyConsumptionHistory> consumptions = consumptionRepository.findByTimestamp(currentTimeStep);
         consumptions.forEach(consumption -> {
             List<EnergySource> sources = energyAllocations.get(consumption.getUserId());
             consumption.setSourcesUsed(sources);
@@ -107,8 +110,9 @@ public class DemandCalculationService implements IDemandCalculationService {
 
     private Map<String, List<EnergySource>> calculateEnergyAllocations(
             double totalProduction, double totalDemand, LocalDateTime timeStep) {
+        var currentTimeStep = remainingEnergyService.processTimeSlot(timeStep);
         Map<String, List<EnergySource>> allocations = new HashMap<>();
-        List<EnergyConsumptionHistory> consumptions = consumptionRepository.findByTimestamp(timeStep);
+        List<EnergyConsumptionHistory> consumptions = consumptionRepository.findByTimestamp(currentTimeStep);
 
         double allocationRatio = totalProduction >= totalDemand ? 1.0 : totalProduction / totalDemand;
 
@@ -152,8 +156,9 @@ public class DemandCalculationService implements IDemandCalculationService {
 
     private CommunityEnergyMetrics calculateCommunityMetrics(
             double totalProduction, double totalDemand, LocalDateTime timeStep) {
+        var currentTimeStep = remainingEnergyService.processTimeSlot(timeStep);
         return CommunityEnergyMetrics.builder()
-                .timestamp(timeStep)
+                .timestamp(currentTimeStep)
                 .totalProduction(totalProduction)
                 .totalDemand(totalDemand)
                 .totalGridEnergy(Math.max(0, totalDemand - totalProduction))
@@ -162,10 +167,12 @@ public class DemandCalculationService implements IDemandCalculationService {
     }
 
     private double calculateTotalProduction(LocalDateTime timeStep) {
-        return productionRepository.sumProductionByTimestamp(timeStep).orElse(0.0);
+        var currentTimeStep = remainingEnergyService.processTimeSlot(timeStep);
+        return productionRepository.sumProductionByTimestamp(currentTimeStep).orElse(0.0);
     }
 
     private double calculateTotalDemand(LocalDateTime timeStep) {
-        return consumptionRepository.sumConsumptionByTimestamp(timeStep).orElse(0.0);
+        var currentTimeStep = remainingEnergyService.processTimeSlot(timeStep);
+        return consumptionRepository.sumConsumptionByTimestamp(currentTimeStep).orElse(0.0);
     }
 }

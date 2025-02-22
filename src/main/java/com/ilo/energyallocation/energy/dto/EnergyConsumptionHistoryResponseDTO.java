@@ -17,9 +17,9 @@ import java.util.List;
 public class EnergyConsumptionHistoryResponseDTO {
     private String id;
     private String userId;
-    private double requestedEnergy;
-    private String strategyUsed;
+    private double amount;
     @Builder.Default
     private List<EnergySource> sourcesUsed = new ArrayList<>();
     private LocalDateTime timestamp;
+    private double totalCost;
 }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -39,12 +38,11 @@ public class EnergyProductionService implements IEnergyProductionService {
         EnergyProduction savedProduction = productionRepository.save(production);
 
         // Initialize or update remaining energy for this time slot
-        LocalDateTime timeSlot = request.getTimestamp().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((request.getTimestamp().getMinute() / 15) * 15);
-        remainingEnergyService.addToRemainingEnergy(timeSlot, request.getEnergyType(), request.getProduction());
+        remainingEnergyService.addToRemainingEnergy(
+                request.getTimestamp(), request.getEnergyType(), request.getProduction());
 
         // Trigger cost recalculation
-        demandCalculationService.updateEnergyCosts(timeSlot);
+        demandCalculationService.updateEnergyCosts(request.getTimestamp());
 
         return productionMapper.toResponse(savedProduction);
     }

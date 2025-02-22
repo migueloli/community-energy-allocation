@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.List;
@@ -42,16 +41,13 @@ public class EnergyConsumptionService implements IEnergyConsumptionService {
     @Override
     public EnergyConsumptionResponseDTO consumeEnergy(
             EnergyConsumptionRequestDTO request, IloUser user) {
-        LocalDateTime timeSlot = request.getTimestamp().truncatedTo(ChronoUnit.MINUTES)
-                .withMinute((request.getTimestamp().getMinute() / 15) * 15);
-
         double remainingAmount = request.getRequiredAmount();
         EnergyConsumptionResponseDTO result = null;
 
         for (var strategy : strategyFactory.getStrategiesInPriorityOrder(user)) {
             if (remainingAmount <= 0) break;
 
-            var consumption = strategy.consumeEnergy(remainingAmount, user, timeSlot);
+            var consumption = strategy.consumeEnergy(remainingAmount, user, request.getTimestamp());
             log.info("Consumption strategy: {} {}", strategy.getClass().getSimpleName(), remainingAmount);
             if (consumption != null) {
                 if (result == null) {
@@ -69,7 +65,7 @@ public class EnergyConsumptionService implements IEnergyConsumptionService {
             throw new ValidationException("No available energy strategy found");
         }
 
-        consumptionLogService.logConsumption(user.getId(), request.getRequiredAmount(), result, timeSlot);
+        consumptionLogService.logConsumption(user.getId(), request.getRequiredAmount(), result, request.getTimestamp());
 
         return result;
     }
@@ -130,7 +126,7 @@ public class EnergyConsumptionService implements IEnergyConsumptionService {
 
     private double calculateTotalDemand(List<EnergyConsumptionHistoryResponseDTO> history) {
         return history.stream()
-                .mapToDouble(EnergyConsumptionHistoryResponseDTO::getRequestedEnergy)
+                .mapToDouble(EnergyConsumptionHistoryResponseDTO::getAmount)
                 .sum();
     }
 
