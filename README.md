@@ -41,20 +41,22 @@ A sophisticated energy management system that optimizes renewable energy distrib
 git clone https://github.com/migueloli/ilo-community-energy-allocation.git
 ```
 
-2. Build and run the application
+2. Configure environment variables
 
-```bash
-./gradlew bootRun
-```
+Rename .env.example to .env and update the values as needed.
 
 3. Start the infrastructure services
 
 ```bash
-docker-compose up -d
+docker-compose --env-file .env up -d
 ```
 
-The application will be available at http://localhost:8081
+The first build might take a while,
+as it includes building the Docker images
+and generating the fake data.
+
+The application will be available at http://localhost:8080
 
 ### API Documentation
 
-Access the Swagger UI at http://localhost:8081/swagger-ui.html
+Access the Swagger UI at http://localhost:8080/swagger-ui.html

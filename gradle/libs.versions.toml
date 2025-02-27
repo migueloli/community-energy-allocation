@@ -12,6 +12,7 @@ bucket4j = "8.10.1"
 mockito = "5.15.2"
 junit = "5.11.4"
 mongock = "5.5.0"
+testcontainers = "1.19.1"
 
 [libraries]
 # Spring boot
@@ -59,6 +60,7 @@ springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openap
 # Spring Test
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
 spring-security-test = { module = "org.springframework.security:spring-security-test", version.ref = "spring-security-test" }
+spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers", version.ref = "spring-boot" }
 
 # JUnit
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
@@ -66,13 +68,17 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 # Mockito
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 
+# Testcontainers
+testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+testcontainers-mongodb = { module = "org.testcontainers:mongodb", version.ref = "testcontainers" }
+
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
 
 [bundles]
 spring-boot-starter = ["spring-boot-starter-web", "spring-boot-starter-data-mongodb", "spring-boot-starter-security", "spring-boot-starter-validation", "spring-boot-starter-actuator", "spring-boot-starter-aop", "spring-boot-starter-data-redis", "spring-boot-starter-cache"]
-spring-boot-test = ["spring-boot-starter-test", "spring-security-test"]
+spring-boot-test = ["spring-boot-starter-test", "spring-security-test", "spring-boot-testcontainers", "testcontainers-junit", "testcontainers-mongodb"]
 resilience4j = ["resilience4j-spring-boot", "resilience4j-circuitbreaker", "resilience4j-timelimiter"]
 bucket4j = ["bucket4j-core", "bucket4j-redis"]
 mongock = ["mongock-springboot", "mongock-core", "mongock-mongodb-driver"]

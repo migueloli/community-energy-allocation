@@ -64,6 +64,7 @@ ehthumbs.db
 Thumbs.db
 
 ### Docker ###
+.env
 *.env
 .dockerignore
 

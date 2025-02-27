@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  SPRING_PROFILES_ACTIVE: prod
+  MONGODB_DATABASE: energydb
+  REDIS_HOST: redis-service
+  REDIS_PORT: "6379"

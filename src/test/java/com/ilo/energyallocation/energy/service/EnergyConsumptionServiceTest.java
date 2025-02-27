@@ -39,8 +39,6 @@ class EnergyConsumptionServiceTest {
     private EnergyProductionRepository productionRepository;
     @Mock
     private IEnergyConsumptionHistoryService consumptionLogService;
-    @Mock
-    private RemainingEnergyTrackingService remainingEnergyService;
 
     @InjectMocks
     private EnergyConsumptionService consumptionService;
@@ -167,7 +165,7 @@ class EnergyConsumptionServiceTest {
     private List<EnergyConsumptionHistoryResponseDTO> createTestConsumptionHistory() {
         return List.of(
                 EnergyConsumptionHistoryResponseDTO.builder()
-                        .requestedEnergy(100.0)
+                        .amount(100.0)
                         .sourcesUsed(List.of(new EnergySource(EnergyType.SOLAR, 100.0)))
                         .timestamp(LocalDateTime.now())
                         .build()

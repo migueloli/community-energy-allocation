@@ -2,13 +2,14 @@ services:
   backend:
     build: .
     ports:
-      - "8081:8081"
+      - "${SERVER_PORT}:${SERVER_PORT}"
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/energydb
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATA_MONGODB_URI: ${MONGODB_URI}
+      SPRING_DATA_MONGODB_DB_NAME: ${MONGODB_DATABASE}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       JWT_KEY: ${JWT_KEY}
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
+      SPRING_REDIS_HOST: ${REDIS_HOST}
+      SPRING_REDIS_PORT: ${REDIS_PORT}
     depends_on:
       - mongo
       - redis
@@ -22,10 +23,7 @@ services:
   redis:
     image: redis:7.2
     ports:
-      - "6379:6379"
-    environment:
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
+      - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
       - redis_data:/data
 volumes:

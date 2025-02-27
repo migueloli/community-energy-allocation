@@ -1,0 +1,109 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: ILO Community Energy Allocation
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://mongodb-service:27017/}
+      database: ${SPRING_DATA_MONGODB_DB_NAME:energydb}
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+  cache:
+    ttl:
+      energyPrices: 60m
+      energySources: 30m
+      userPreferences: 15m
+    type: redis
+    redis:
+      time-to-live: 1h
+
+jwt:
+  secret: af83ba535ef538cb1651c86453538460cb46cba25778d4e06b8c6b507dd676ce90309a4a1377c54b5ed1be657dd0d76cc434fdc9e917ca8b8fba64b806faaf48a9aa8883af6db66d95b97ace9c5bf5709071a77728bf26ec069ff09a2cf0a6d8be2674835ef23c64caae5be65c2d9aa6e13b33e2a19f3db70dfd8a03591ac80b0c80fd59f6ce0414ae2a712bc70ca80d5e4e6254f90154bd60528f3ed0a3c615650f5863ac14ba04d2b7abcf591a727fe1b3537aeacf2e909322dfecf202ecd6045708c3556787d09253fcc43850441b5358ee8c89595227ca76f16125bec6b00f53975fca75bd46a3cc0eb1ec082f60794b219596a9eb776841ec20c09219cf
+  access-token:
+    expiration: 3600000
+  refresh-token:
+    expiration: 604800000
+  reset-token:
+    expiration: 3600000
+
+logging:
+  level:
+    root: DEBUG
+    com.ilo.energyallocation: DEBUG
+    org.springframework: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.cache: DEBUG
+    org.springframework.web: DEBUG
+    io.mongock: DEBUG
+    io.lettuce: DEBUG
+    org.mongodb: DEBUG
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      redis:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 20s
+        failureRateThreshold: 50
+      rateLimit:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 20s
+        failureRateThreshold: 50
+  retry:
+    instances:
+      redis:
+        maxAttempts: 3
+        waitDuration: 100ms
+      rateLimit:
+        maxAttempts: 3
+        waitDuration: 100ms
+
+bucket4j:
+  enabled: true
+  filters:
+    - cache-name: buckets
+      url: /api.*
+      rate-limits:
+        - bandwidths:
+            - capacity: ${rate-limit.capacity:100}
+              time: 1
+              unit: MINUTES
+  cache-to-use: redis_sync
+  redis:
+    host: ${SPRING_REDIS_HOST:redis}
+    port: ${SPRING_REDIS_PORT:6379}
+
+rate-limit:
+  capacity: 100
+  duration: 1m
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    defaultModelsExpandDepth: -1
+  info:
+    title: ILO Community Energy Allocation API
+    version: 1.0.0
+    description: API documentation for the ILO Community Energy Allocation system
+    contact:
+      name: Development Team
+      email: dev@ilo.com
+
+mongock:
+  enabled: false
+  migration-scan-package: com.ilo.energyallocation.migrations
