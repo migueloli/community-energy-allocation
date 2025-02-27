@@ -55,7 +55,7 @@ The first build might take a while,
 as it includes building the Docker images
 and generating the fake data.
 
-The application will be available at http://localhost:8080
+The application will be available at http://localhost:8081
 
 ### API Documentation
 
